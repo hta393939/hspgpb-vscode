@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <title>gpb parser</title>
+        <link rel="stylesheet" href="./index.css" />
+    </head>
+    <body>
+        <div>
+            <div>gpb parser</div>
+            <div>
+                <canvas id="maincanvas"></canvas>
+                <canvas id="subcanvas"></canvas>
+            </div>
+            <div>
+                <div id="idmain" class="drop">ここに .xml ファイルをドロップする</div>
+            </div>
+            <div>
+                <div id="idsub" class="drop">ここに .gpb ファイルをドロップする</div>
+            </div>
+            <div>
+                <button></button>
+                <button></button>
+                <button></button>
+            </div>
+        </div>
+
+        <hr />
+
+        <script src="../third_party/three.min.js"></script>
+        <script src="../third_party/OrbitControls.js"></script>
+        <script src="../third_party/TrackballControls.js"></script>
+        <script src="../lib/gpb.js"></script>
+        <script src="../lib/gpbxmlparser.js"></script>
+        <script src="../lib/gpbreplacer.js"></script>
+        <script src="../lib/gpbthree.js"></script>
+        <script src="./renderer.js"></script>
+        <script src="./index.js"></script>
+    </body>
+</html>
+
+

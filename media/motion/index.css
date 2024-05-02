@@ -1,0 +1,41 @@
+@charset "UTF-8";
+
+body {
+    user-select: none;
+}
+
+.pt {
+    cursor: pointer;
+}
+
+.toright {
+    display: flex;
+    flex-direction: row;
+}
+
+.tobottom {
+    display: flex;
+    flex-direction: column;
+}
+
+.spacing {
+    width: 1em;
+}
+
+.drop {
+    font-weight: bold;
+    text-align: center;
+    margin: 1em;
+    border: dashed 4px black;
+    border-radius: 1em;
+    padding: 1em;
+}
+
+#idmain, #idsub {
+    text-align: center;
+    margin: 1rem;
+    border: dashed 4px black;
+    padding: 1rem;
+}
+
+

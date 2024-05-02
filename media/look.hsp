@@ -1,0 +1,134 @@
+/**
+ * @file look.hsp
+ */
+
+#include "hgimg4.as"
+
+#module
+#deffunc _children int _id, local _s, local _childname, local _name
+	_s = ""
+	gpnodeinfo _childname, _id, GPNODEINFO_CHILD, _name
+	if stat < 0 | _childname != "" {
+		return _s
+	}
+	_s += _childname + "\r\n"
+	return _s
+#global
+
+    errmsg = ""
+    gpreset
+
+    name = "tamane2.gpb"
+
+    filepath = strf("%s", "res")
+    filepath += strf("/%s", name)
+    gpload id, filepath
+    if (id < 0) {
+        errmsg = "gpload error"
+    }
+
+	gosub *guessheight
+	guess_height = max_y
+    guess_height = 200.0
+
+
+    radius = 10.0
+    longi = 0.0
+    lati = 0.0
+    premousew = mousew
+
+*main
+    stick key, 0x0f
+    mw = mousew
+// orbit camera
+
+    premousew = mw
+
+    x = 0.5
+    y = guess_height * 0.5
+    z = guess_height * 2.0
+
+    redraw 0
+
+    color 0, 0, 0
+    boxf
+
+    setpos GPOBJ_CAMERA, x, y, z
+    gplookat GPOBJ_CAMERA, 0, guess_height * 0.5, 0
+
+    gpdraw
+
+
+    color 255, 255, 255
+    pos 8, 8
+    if (id < 0) {
+        color 255, 0, 0
+        print errmsg
+    } else {
+	    print "OK"
+	    print note
+	}
+
+    redraw 1
+    await 1000/60
+    goto *main
+
+
+*guessheight
+	note = ""
+	notesel note
+	max_y = 0.0
+
+	gpnodeinfo nodename, id, GPNODEINFO_NAME
+	noteadd strf("n, %s", nodename)
+
+	gpnodeinfo skinrootname, id, GPNODEINFO_SKINROOT, ""
+	noteadd strf("sr, %s", skinrootname)
+
+	nodename = skinrootname
+
+	gpnodeinfo childname, id, GPNODEINFO_CHILD, nodename
+	if stat < 0 {
+	}
+	noteadd strf("c, %s", childname)
+
+	eldername = childname
+*guessheight5
+	repeat 10
+		gpnodeinfo sibname, id, GPNODEINFO_SIBLING, eldername
+		if stat >= 0 & sibname != "" {
+			noteadd strf("s, %s", sibname)
+			eldername = sibname
+			//goto *guessheight5
+		} else {
+			break
+		}
+	loop
+
+	parentname = childname
+	repeat 10
+		gpnodeinfo childname, id, GPNODEINFO_CHILD, parentname
+		if stat < 0 | childname != "" {
+			break
+		}
+		noteadd strf("child, %s", childname)
+		parentname = childname
+	loop
+
+	num = noteinfo(0)
+	repeat num
+		noteget nodename, cnt
+
+//	nodename = "asi_L_"
+		gpnodeinfo infonode, id, GPNODEINFO_NODE, nodename
+		if infonode > 0 {
+			getpos infonode, x, y, z
+			if y >= max_y {
+				max_y = y
+			}
+		}
+	loop
+	title strf("max_y, %f", max_y)
+	
+	return
+
