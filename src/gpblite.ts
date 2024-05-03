@@ -334,12 +334,28 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
 
         <link href="${styleResetUri}" rel="stylesheet" />
         <link href="${styleVSCodeUri}" rel="stylesheet" />
-        <link href="gpblite.css" rel="stylesheet" />
 
-        <title>HSP Gpb Lite</title>
+        <link href="gpblite.css" rel="stylesheet" />
+        <link href="style/color.css" rel="stylesheet" />
+
+        <title></title>
       </head>
       <body>
         <div class="corge">.gpb ファイル</div>
+        <div class="toright">
+          <div class="text0">0</div>
+          <div class="text1">1</div>
+          <div class="text2">2</div>
+        </div>
+        <details open>
+          <summary class="pt">情報</summary>
+          <div class="toright">
+            <div class="purple">purple</div>
+            <div class="red">red</div>
+            <div class="green">green</div>
+            <div class="blue">blue</div>
+          </div>
+        </details>
         <div class="drawing-canvas"></div>
 
         <div>
@@ -347,13 +363,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
           <div id="materialelement"></div>
         </div>
 
-        <div class="drawing-controls">
-          <button data-color="red" class="red" title="Red"></button>
-          <button data-color="green" class="green" title="Green"></button>
-        </div>
-
-        <script src="third_party/three.min.js"></script>
-        <script src="third_party/OrbitControls.js"></script>
         <script nonce="${nonce}" src="gpblite.js"></script>
       </body>
       </html>`;

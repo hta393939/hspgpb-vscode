@@ -53,12 +53,45 @@
  *
  */
     async reset(val) {
-      let text = `${typeof val}, ${val}`;
-      vscode.window.showInformationMessage(text);
-      console.log('val', val);
+      {
+        const q = document.querySelector('.text0');
+        if (q) {
+          q.textContent = `${val}, ${val.length}, ${val.byteLength}`;
+        }
+      }
 
-      //const model = new GPB.Model();
-      //model.parse();
+      let text = `${typeof val}, ${val}`;
+      { /*
+        try {
+          const model = new GPB.Model();
+          model.parseGPB(val.buffer);
+
+          const maker = new GPB.Maker();
+          maker.makeModel(model);
+
+          text += `, ${'success'}`;
+        } catch(e) {
+          text += `, ${e.message}`;
+        }*/
+
+        const q = document.querySelector('.text1');
+        if (q) {
+          q.textContent = text;
+        }
+
+
+      }
+
+      //vscode.window.showInformationMessage(text);
+      //text = `${window.THREE}, ${window.THREE?.OrbitControls}`;
+      //vscode.window.showInformationMessage(text);
+      {
+        const q = document.querySelector('.text2');
+        if (q) {
+          q.textContent = text;
+        }
+      }
+      console.log('val', val);
 
       this._redraw();
     }
