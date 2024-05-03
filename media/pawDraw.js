@@ -64,17 +64,6 @@
 			}
 		}
 
-		beginStoke(/** @type {string} */ color) {
-			this.currentStroke = new Stroke(color);
-			this.strokes.push(this.currentStroke);
-		}
-
-		endStroke() {
-			const previous = this.currentStroke;
-			this.currentStroke = undefined;
-			return previous;
-		}
-
 		setEditable(editable) {
 			this.editable = editable;
 			const colorButtons = /** @type {NodeListOf<HTMLButtonElement>} */ (document.querySelectorAll('.drawing-controls button'));
@@ -228,7 +217,7 @@
 
 	const editor = new GpbLiteEditor(document.querySelector('.drawing-canvas'));
 
-	// Handle messages from the extension
+	// メッセージ処理 from the extension
 	window.addEventListener('message', async e => {
 		const { type, body, requestId } = e.data;
 		switch (type) {
