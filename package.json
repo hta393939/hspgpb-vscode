@@ -34,18 +34,10 @@
         "category": "Paw Draw"
       }
     ],
-    "menus": {
-      "editor/content": [
-        {
-          "command": "hspgpb-vscode.corge",
-          "title": "HSPGPB: corge"
-        }
-      ]
-    },
     "customEditors": [
       {
-        "viewType": "hspgpb-vscode.pawDraw",
-        "displayName": "HSPGPB: Paw Draw",
+        "viewType": "hspgpb-vscode.gpblite",
+        "displayName": "HSPGPB: lite .gpb file previewer",
         "selector": [
           {
             "filenamePattern": "*.gpb"

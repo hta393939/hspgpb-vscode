@@ -1,6 +1,6 @@
 // @ts-check
 
-// This script is run within the webview itself
+// レンダラ(webview)で動作するスクリプト
 (function () {
   // @ts-ignore
   const vscode = acquireVsCodeApi();
@@ -10,35 +10,27 @@
  */
   class GpbLite {
     constructor( /** @type {HTMLElement} */ parent) {
-      this.ready = false;
       this._initElements(parent);
     }
 
     _initElements(/** @type {HTMLElement} */ parent) {
-      const colorButtons = /** @type {NodeListOf<HTMLButtonElement>} */ (document.querySelectorAll('.drawing-controls button'));
-      for (const colorButton of colorButtons) {
-        colorButton.addEventListener('click', e => {
-          e.stopPropagation();
-          colorButtons.forEach(button => button.classList.remove('active'));
-          colorButton.classList.add('active');
-          this.drawingColor = colorButton.dataset['color'];
-        });
+/**
+ * @type {HTMLCanvasElement}
+ */
+      const canvas = document.createElement('canvas');
+      canvas.width = 960;
+      canvas.height = 540;
+      parent.appendChild(canvas);
+
+      {
+        const c = canvas.getContext('2d');
+        if (c) {
+          c.fillStyle = 'red';
+          c.fillRect(5, 5, 800, 400);
+          c.fillStyle = 'gray';
+          c.fillText('gpblite \u{1f527} gpblite', 480, 270);
+        }
       }
-
-      this.wrapper = document.createElement('div');
-      this.wrapper.style.position = 'relative';
-      parent.append(this.wrapper);
-
-      this.initialCanvas = document.createElement('canvas');
-      this.initialCtx = this.initialCanvas.getContext('2d');
-      this.wrapper.append(this.initialCanvas);
-
-      this.drawingCanvas = document.createElement('canvas');
-      this.drawingCanvas.style.position = 'absolute';
-      this.drawingCanvas.style.top = '0';
-      this.drawingCanvas.style.left = '0';
-      this.drawingCtx = this.drawingCanvas.getContext('2d');
-      this.wrapper.append(this.drawingCanvas);
 
       parent.addEventListener('mousedown', () => {
         return;
@@ -49,23 +41,25 @@
       });
 
       parent.addEventListener('mousemove', e => {
-        if (!isDrawing || !this.ready || !this.editable) {
-          return;
-        }
-        const rect = this.wrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
       });
     }
 
     _redraw() {
+
       return;
     }
 
-    /**
+/**
+ *
+ */
+    async reset(val) {
+      let text = `${typeof val}, ${val}`;
+      vscode.window.showInformationMessage(text);
+      console.log('val', val);
 
-     */
-    async reset() {
+      //const model = new GPB.Model();
+      //model.parse();
+
       this._redraw();
     }
   }
@@ -77,16 +71,9 @@
     const { type, body } = e.data;
     switch (type) {
       case 'init':
-        {
-          if (body.untitled) { // 初期バイナリで初期化
-            await editor.resetUntitled();
-            return;
-          } else {
             // 既存のバイナリで初期化
-            await editor.reset(body.value);
-            return;
-          }
-        }
+        await editor.reset(body.value);
+        return;
     }
   });
 

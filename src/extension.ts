@@ -2,9 +2,12 @@ import * as vscode from 'vscode';
 import { GpbLiteEditorProvider } from './gpbliteeditor';
 
 import { exec } from 'node:child_process';
+import { GpbLiteProvider } from './gpblite';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(GpbLiteEditorProvider.register(context));
+
+	context.subscriptions.push(GpbLiteProvider.register(context));
 
 	{ // commands に記載したコマンドの実装
 		const name = 'hspgpb-vscode.corge';
