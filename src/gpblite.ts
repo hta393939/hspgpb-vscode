@@ -342,10 +342,10 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
       </head>
       <body>
         <div class="corge">.gpb ファイル</div>
-        <div class="toright">
-          <div class="text0">0</div>
-          <div class="text1">1</div>
-          <div class="text2">2</div>
+        <div class="tobottom">
+          <div class="red text0">0</div>
+          <div class="green text1">1</div>
+          <div class="blue text2">2</div>
         </div>
         <details open>
           <summary class="pt">情報</summary>
@@ -363,6 +363,11 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
           <div id="materialelement"></div>
         </div>
 
+        <!-- nonce を指定すること -->
+        <script nonce="${nonce}" src="third_party/three.min.js"></script>
+        <script nonce="${nonce}" src="third_party/OrbitControls.js"></script>
+        <script nonce="${nonce}" src="lib/gpb.js"></script>
+        <script nonce="${nonce}" src="lib/gpbthree.js"></script>
         <script nonce="${nonce}" src="gpblite.js"></script>
       </body>
       </html>`;
