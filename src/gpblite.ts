@@ -335,7 +335,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
         <div class="tobottom">
           <div class="red text0">0</div>
           <div class="green text1">1</div>
-          <div class="blue text2">2</div>
         </div>
         <details open>
           <summary class="pt">情報</summary>
@@ -343,7 +342,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
             <div class="purple">purple</div>
             <div class="red">red</div>
             <div class="green">green</div>
-            <div class="blue">blue</div>
           </div>
         </details>
         <div class="drawing-canvas"></div>

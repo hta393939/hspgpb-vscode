@@ -67,13 +67,6 @@
  *
  */
     async reset(val) {
-      {
-        const q = document.querySelector('.text0');
-        if (q) {
-          q.textContent = `${val}, ${val.length}, ${val.byteLength}`;
-        }
-      }
-
       let text = `text1, `;
       {
         try {
@@ -90,7 +83,7 @@
             this.fovdeg,
           );
 
-          text += `, ${'success'}`;
+          text += `, ${'success'}, ${window.devicePixelRatio}`;
         } catch(e) {
           text += `, ${e.message}`;
         }
@@ -100,16 +93,6 @@
           q.textContent = text;
         }
 
-      }
-
-      //vscode.window.showInformationMessage(text);
-      text = `${window.THREE ? true : false}, ${window.THREE?.OrbitControls ? true : false}`;
-      //vscode.window.showInformationMessage(text);
-      {
-        const q = document.querySelector('.text2');
-        if (q) {
-          q.textContent = text;
-        }
       }
 
     }
@@ -133,8 +116,8 @@
         preserveDrawingBuffer: true,
       });
       this.renderer = renderer;
-      {
-        renderer.setSize(this.width, this.height);
+      { // スタイル反映無し
+        renderer.setSize(this.width, this.height, false);
       }
 
       const scene = new THREE.Scene();
