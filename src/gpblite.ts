@@ -302,15 +302,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
     const baseStr = base.toString() + '/';
 
     // Local path to script and css for the webview
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
-      this._context.extensionUri, 'media', 'gpblite.js'));
-
-    const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(
-      this._context.extensionUri, 'media', 'reset.css'));
-
-    const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(
-      this._context.extensionUri, 'media', 'vscode.css'));
-
 //    const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
 //      this._context.extensionUri, 'media', 'gpblite.css'));
 
@@ -356,11 +347,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
           </div>
         </details>
         <div class="drawing-canvas"></div>
-
-        <div>
-          <div>未実装: 材質</div>
-          <div id="materialelement"></div>
-        </div>
 
         <!-- nonce を指定すること -->
         <script nonce="${nonce}" src="third_party/three.min.js"></script>

@@ -12,6 +12,8 @@
     constructor( /** @type {HTMLElement} */ parent) {
       this.gr = null;
       this.fovdeg = 45;
+      this.width = 512;
+      this.height = 512;
 
       this._initElements(parent);
     }
@@ -21,8 +23,8 @@
  * @type {HTMLCanvasElement}
  */
       const canvas = document.createElement('canvas');
-      canvas.width = 960;
-      canvas.height = 540;
+      canvas.width = this.width;
+      canvas.height = this.height;
       parent.appendChild(canvas);
 
       this.initGL(canvas);
@@ -110,8 +112,6 @@
         }
       }
 
-
-      this._redraw();
     }
 
     update() {
@@ -134,14 +134,14 @@
       });
       this.renderer = renderer;
       {
-        renderer.setSize(960, 540);
+        renderer.setSize(this.width, this.height);
       }
 
       const scene = new THREE.Scene();
       this.scene = scene;
 
       const camera = new THREE.PerspectiveCamera(this.fovdeg,
-        4 / 3,
+        this.width / this.height,
         0.02, 1000);
       this.camera = camera;
       {
