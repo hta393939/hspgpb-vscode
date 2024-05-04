@@ -311,8 +311,8 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
     const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(
       this._context.extensionUri, 'media', 'vscode.css'));
 
-    const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
-      this._context.extensionUri, 'media', 'gpblite.css'));
+//    const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
+//      this._context.extensionUri, 'media', 'gpblite.css'));
 
     // Use a nonce to whitelist which scripts can be run
     const nonce = getNonce();
@@ -332,8 +332,8 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link href="${styleResetUri}" rel="stylesheet" />
-        <link href="${styleVSCodeUri}" rel="stylesheet" />
+        <link href="reset.css" rel="stylesheet" />
+        <link href="vscode.css" rel="stylesheet" />
 
         <link href="gpblite.css" rel="stylesheet" />
         <link href="style/color.css" rel="stylesheet" />
@@ -341,7 +341,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
         <title></title>
       </head>
       <body>
-        <div class="corge">.gpb ファイル</div>
         <div class="tobottom">
           <div class="red text0">0</div>
           <div class="green text1">1</div>

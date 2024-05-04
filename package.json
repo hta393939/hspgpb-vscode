@@ -2,7 +2,7 @@
   "name": "hspgpb-vscode",
   "displayName": "hspgpb-vscode",
   "description": "hsp gpb file lite looker for VS Code",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "publisher": "hta39393",
   "license": "MIT",
   "repository": {
@@ -26,12 +26,12 @@
       {
         "command": "hspgpb-vscode.helloWorld",
         "title": "HSPGPB: Hello World",
-        "category": "Paw Draw"
+        "category": "HSP"
       },
       {
         "command": "hspgpb-vscode.pawDraw.new",
         "title": "HSPGPB: Create new gpb Document",
-        "category": "Paw Draw"
+        "category": "HSP"
       },
       {
         "command": "hspgpb-vscode.material",

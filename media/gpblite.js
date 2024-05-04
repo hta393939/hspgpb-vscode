@@ -11,6 +11,7 @@
   class GpbLite {
     constructor( /** @type {HTMLElement} */ parent) {
       this.gr = null;
+      this.fovdeg = 45;
 
       this._initElements(parent);
     }
@@ -26,6 +27,38 @@
 
       this.initGL(canvas);
       this.update();
+    }
+
+    adjustCamera(cover, fovdeg) {
+      if (!cover) {
+        return;
+      }
+
+      const target = new THREE.Vector3().fromArray([0, 1, 2].map(
+          index => (cover.max[index] + cover.min[index]) * 0.5
+      ));
+      const rads = [0, 1, 2].map(index => {
+        return (cover.max[index] - cover.min[index]) * 0.5;
+      });
+
+      const ang = fovdeg * Math.PI * 0.5 / 180;
+      const pos = new THREE.Vector3(
+        target.x,
+        target.y,
+        target.z + rads[1] / Math.tan(ang) + rads[2]
+      );
+
+// 軸長さ評価するか??
+        //axisSize = 100;
+
+      const el = document.querySelector('.text0');
+      if (el) {
+        el.textContent = `${ang}, ${target.y} ${target.z} ${pos.z}`;
+      }
+
+      this.control.target0.copy(target);
+      this.control.position0.copy(pos);
+      this.control.reset();
     }
 
 /**
@@ -49,6 +82,11 @@
           const gr = maker.makeModel(model);
           this.gr = gr;
           this.scene?.add(gr);
+
+          this.adjustCamera(
+            gr?.userData?.cover,
+            this.fovdeg,
+          );
 
           text += `, ${'success'}`;
         } catch(e) {
@@ -102,27 +140,31 @@
       const scene = new THREE.Scene();
       this.scene = scene;
 
-      const camera = new THREE.PerspectiveCamera(45,
+      const camera = new THREE.PerspectiveCamera(this.fovdeg,
         4 / 3,
         0.02, 1000);
       this.camera = camera;
       {
-        camera.position.set(1, 1, 5);
-        camera.lookAt(new THREE.Vector3(0, 1, 0));
+        let axisSize = 10;
+        const pos = new THREE.Vector3(1, 1, 5);
+        // 中心
+        const target = new THREE.Vector3(0, 1, 0);
+
+        camera.position.copy(pos);
+        camera.lookAt(target);
+
+        const control = new THREE.OrbitControls(camera, canvas);
+        this.control = control;
+        control.target = target;
+
+        const axes = new THREE.AxesHelper(axisSize);
+        scene.add(axes);
       }
 
       {
         const light = new THREE.AmbientLight(0xcccccc);
         scene.add(light);
       }
-
-      {
-        const axes = new THREE.AxesHelper(10);
-        scene.add(axes);
-      }
-
-      const control = new THREE.OrbitControls(camera, canvas);
-      this.control = control;
 
       if (this.gr) {
         scene.add(this.gr);
