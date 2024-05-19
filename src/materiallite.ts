@@ -1,17 +1,17 @@
 /**
- * @file gpbliteeditor.ts
+ * @file materiallite.ts
  */
 
 import * as vscode from 'vscode';
 import { Disposable, disposeAll } from './dispose';
 import { getNonce } from './util';
 
-interface GpbLiteEdit {
+interface MaterialLiteEdit {
     readonly color: string;
     readonly stroke: ReadonlyArray<[number, number]>;
 }
 
-interface GpbLiteDocumentDelegate {
+interface MaterialLiteDocumentDelegate {
     getFileData(): Promise<Uint8Array>;
 }
 
@@ -20,14 +20,14 @@ interface GpbLiteDocumentDelegate {
 /**
  * エディタとしては動作しない
  */
-class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
+class MaterialLiteDocument extends Disposable implements vscode.CustomDocument {
     static async create(
         uri: vscode.Uri,
         backupId: string | undefined,
-        delegate: GpbLiteDocumentDelegate) {
+        delegate: MaterialLiteDocumentDelegate) {
         const dataFile = typeof backupId === 'string' ? vscode.Uri.parse(backupId) : uri;
-        const fileData = await GpbLiteDocument.readFile(dataFile);
-        return new GpbLiteDocument(uri, fileData, delegate);
+        const fileData = await MaterialLiteDocument.readFile(dataFile);
+        return new MaterialLiteDocument(uri, fileData, delegate);
     }
 
 	private static async readFile(uri: vscode.Uri): Promise<Uint8Array> {
@@ -41,16 +41,16 @@ class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
 /**
  * 編集可能時のみ使用
  */
-	private _edits: Array<GpbLiteEdit> = [];
-	private _savedEdits: Array<GpbLiteEdit> = [];
+	private _edits: Array<MaterialLiteEdit> = [];
+	private _savedEdits: Array<MaterialLiteEdit> = [];
     private _documentData: Uint8Array;
     
-    private readonly _delegate: GpbLiteDocumentDelegate;
+    private readonly _delegate: MaterialLiteDocumentDelegate;
 
     private constructor(
         uri: vscode.Uri,
         initialContent: Uint8Array,
-        delegate: GpbLiteDocumentDelegate
+        delegate: MaterialLiteDocumentDelegate
     ) {
         super();
         this._uri = uri;
@@ -71,7 +71,7 @@ class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
 
 	private readonly _onDidChangeDocument = this._register(new vscode.EventEmitter<{
 		readonly content?: Uint8Array;
-		readonly edits: readonly GpbLiteEdit[];
+		readonly edits: readonly MaterialLiteEdit[];
 	}>());
 	/**
 	 * Fired to notify webviews that the document has changed.
@@ -105,7 +105,7 @@ class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
 	 *
 	 * This fires an event to notify VS Code that the document has been edited.
 	 */
-	makeEdit(edit: GpbLiteEdit) {
+	makeEdit(edit: MaterialLiteEdit) {
 		this._edits.push(edit);
 
 		this._onDidChange.fire({
@@ -148,7 +148,7 @@ class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
 	 * Called by VS Code when the user calls `revert` on a document.
 	 */
 	async revert(_cancellation: vscode.CancellationToken): Promise<void> {
-		const diskContent = await GpbLiteDocument.readFile(this.uri);
+		const diskContent = await MaterialLiteDocument.readFile(this.uri);
 		this._documentData = diskContent;
 		this._edits = this._savedEdits;
 		this._onDidChangeDocument.fire({
@@ -193,27 +193,28 @@ class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
  * - Implementing save, undo, redo, and revert.
  * - Backing up a custom editor.
  */
-export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLiteDocument> {
+export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<MaterialLiteDocument> {
 
 	private static newFileId = 1;
 
 	public static register(context: vscode.ExtensionContext): vscode.Disposable {
-		vscode.commands.registerCommand('hspgpb-vscode.pawDraw.new', () => {
+		vscode.commands.registerCommand('hspgpb-vscode.bar', () => {
+
 			const workspaceFolders = vscode.workspace.workspaceFolders;
 			if (!workspaceFolders) {
 				vscode.window.showErrorMessage("Creating new Paw Draw files currently requires opening a workspace");
 				return;
 			}
 
-			const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `new-${GpbLiteEditorProvider.newFileId++}.gpb`)
+			const uri = vscode.Uri.joinPath(workspaceFolders[0].uri, `new-${MaterialLiteEditorProvider.newFileId++}.gpb`)
 				.with({ scheme: 'untitled' });
 
-			vscode.commands.executeCommand('vscode.openWith', uri, GpbLiteEditorProvider.viewType);
+			vscode.commands.executeCommand('vscode.openWith', uri, MaterialLiteEditorProvider.viewType);
 		});
 
 		return vscode.window.registerCustomEditorProvider(
-			GpbLiteEditorProvider.viewType,
-			new GpbLiteEditorProvider(context),
+			MaterialLiteEditorProvider.viewType,
+			new MaterialLiteEditorProvider(context),
 			{
 				// For this demo extension, we enable `retainContextWhenHidden` which keeps the
 				// webview alive even when it is not visible. You should avoid using this setting
@@ -225,7 +226,7 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 			});
 	}
 
-	private static readonly viewType = 'hspgpb-vscode.pawDraw';
+	private static readonly viewType = 'hspgpb-vscode.materialview';
 
 	/**
 	 * Tracks all known webviews
@@ -242,8 +243,8 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 		uri: vscode.Uri,
 		openContext: { backupId?: string },
 		_token: vscode.CancellationToken
-	): Promise<GpbLiteDocument> {
-		const document: GpbLiteDocument = await GpbLiteDocument.create(uri, openContext.backupId, {
+	): Promise<MaterialLiteDocument> {
+		const document: MaterialLiteDocument = await MaterialLiteDocument.create(uri, openContext.backupId, {
 			getFileData: async () => {
 				const webviewsForDocument = Array.from(this.webviews.get(document.uri));
 				if (!webviewsForDocument.length) {
@@ -281,7 +282,7 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 	}
 
 	async resolveCustomEditor(
-		document: GpbLiteDocument,
+		document: MaterialLiteDocument,
 		webviewPanel: vscode.WebviewPanel,
 		_token: vscode.CancellationToken
 	): Promise<void> {
@@ -316,31 +317,31 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 		});
 	}
 
-	private readonly _onDidChangeCustomDocument = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<GpbLiteDocument>>();
+	private readonly _onDidChangeCustomDocument = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<MaterialLiteDocument>>();
 	public readonly onDidChangeCustomDocument = this._onDidChangeCustomDocument.event;
 
-	public saveCustomDocument(document: GpbLiteDocument, cancellation: vscode.CancellationToken): Thenable<void> {
+	public saveCustomDocument(document: MaterialLiteDocument, cancellation: vscode.CancellationToken): Thenable<void> {
 		return document.save(cancellation);
 	}
 
-	public saveCustomDocumentAs(document: GpbLiteDocument, destination: vscode.Uri, cancellation: vscode.CancellationToken): Thenable<void> {
+	public saveCustomDocumentAs(document: MaterialLiteDocument, destination: vscode.Uri, cancellation: vscode.CancellationToken): Thenable<void> {
 		return document.saveAs(destination, cancellation);
 	}
 
-	public revertCustomDocument(document: GpbLiteDocument, cancellation: vscode.CancellationToken): Thenable<void> {
+	public revertCustomDocument(document: MaterialLiteDocument, cancellation: vscode.CancellationToken): Thenable<void> {
 		return document.revert(cancellation);
 	}
 
-	public backupCustomDocument(document: GpbLiteDocument, context: vscode.CustomDocumentBackupContext, cancellation: vscode.CancellationToken): Thenable<vscode.CustomDocumentBackup> {
+	public backupCustomDocument(document: MaterialLiteDocument, context: vscode.CustomDocumentBackupContext, cancellation: vscode.CancellationToken): Thenable<vscode.CustomDocumentBackup> {
 		return document.backup(context.destination, cancellation);
 	}
 
 	//#endregion
 
 	/**
-	 * Get the static HTML used for in our editor's webviews.
+     * ページテキストを返す
 	 */
-	private getHtmlForWebview(webview: vscode.Webview): string {
+	public getHtmlForWebview(webview: vscode.Webview): string {
 		const base = webview.asWebviewUri(
 			vscode.Uri.joinPath(
 				this._context.extensionUri, 'media'
@@ -351,15 +352,6 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 		// Local path to script and css for the webview
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this._context.extensionUri, 'media', 'pawDraw.js'));
-
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this._context.extensionUri, 'media', 'reset.css'));
-
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this._context.extensionUri, 'media', 'vscode.css'));
-
-		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this._context.extensionUri, 'media', 'pawDraw.css'));
 
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
@@ -386,6 +378,7 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 				<title>HSP Gpb Lite</title>
 			</head>
 			<body>
+            bar で表示したい1
 				<div class="corge">gpb ファイル</div>
 				<div class="drawing-canvas"></div>
 
@@ -418,10 +411,10 @@ export class GpbLiteEditorProvider implements vscode.CustomEditorProvider<GpbLit
 		panel.webview.postMessage({ type, body });
 	}
 
-	private onMessage(document: GpbLiteDocument, message: any) {
+	private onMessage(document: MaterialLiteDocument, message: any) {
 		switch (message.type) {
 			case 'stroke':
-				document.makeEdit(message as GpbLiteEdit);
+				document.makeEdit(message as MaterialLiteEdit);
 				return;
 
 			case 'response':

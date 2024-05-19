@@ -1,8 +1,12 @@
+// エントリファイル
+
 import * as vscode from 'vscode';
 import { GpbLiteEditorProvider } from './gpbliteeditor';
 
 import { exec } from 'node:child_process';
 import { GpbLiteProvider } from './gpblite';
+
+import { MaterialLiteEditorProvider } from './materiallite';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(GpbLiteEditorProvider.register(context));
@@ -43,6 +47,36 @@ export function activate(context: vscode.ExtensionContext) {
       exec('mspaint.exe', (error, stdout, stderr) => {
         // 終了後
       });
+    }));
+  }
+
+  { // commands
+    const name = 'hspgpb-vscode.foo';
+    context.subscriptions.push(vscode.commands.registerCommand(name, () => {
+      vscode.window.showInformationMessage(`material ${name}`);
+    }));
+  }
+
+  {
+    const name = 'hspgpb-vscode.bar';
+    context.subscriptions.push(vscode.commands.registerCommand(name, () => {
+      vscode.window.showInformationMessage(`bar ${name}`);
+
+      const editor = vscode.window.activeTextEditor;
+      const doc = editor?.document;
+      let text = doc?.getText();
+      vscode.window.showInformationMessage(text ?? 'material undefined');
+
+      const panel = vscode.window.createWebviewPanel(
+        'hspgpb-vscode', // viewType
+        'titlesample2',
+        vscode.ViewColumn.Two,
+        {}
+      );
+
+      const provider = new MaterialLiteEditorProvider(context);
+      panel.webview.html = provider.getHtmlForWebview(panel.webview);
+
     }));
   }
 

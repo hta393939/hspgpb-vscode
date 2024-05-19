@@ -2,7 +2,7 @@
   "name": "hspgpb-vscode",
   "displayName": "hspgpb-vscode",
   "description": "hsp gpb file lite looker for VS Code",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "publisher": "hta39393",
   "license": "MIT",
   "repository": {
@@ -36,6 +36,37 @@
       {
         "command": "hspgpb-vscode.material",
         "title": "HSPGPB: .material preview"
+      },
+      {
+        "command": "hspgpb-vscode.foo",
+        "title": "HSPGPB: foo command"
+      },
+      {
+        "command": "hspgpb-vscode.bar",
+        "title": "HSPGPB: bar command"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceLangId == hspgpb-vscode.material",
+          "command": "hspgpb-vscode.foo",
+          "group": "HSPGPB"
+        },
+        {
+          "when": "resourceLangId === hspgpb-vscode.material",
+          "command": "hspgpb-vscode.bar",
+          "group": "HSPGPB"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "hspgpb-vscode.material",
+        "aliases": ["material for gpb"],
+        "extensions": [
+          ".material"
+        ]
       }
     ],
     "customEditors": [

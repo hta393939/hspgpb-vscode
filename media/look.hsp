@@ -15,10 +15,13 @@
 	return _s
 #global
 
+#define DELTA (0.002)
+
     errmsg = ""
     gpreset
 
     name = "tamane2.gpb"
+    name = "tamane2"
 
     filepath = strf("%s", "res")
     filepath += strf("/%s", name)
@@ -32,21 +35,88 @@
     guess_height = 200.0
 
 
-    radius = 10.0
+    radius = guess_height * 2.0
     longi = 0.0
     lati = 0.0
     premousew = mousew
 
-*main
-    stick key, 0x0f
-    mw = mousew
-// orbit camera
+	keepx = 0
+	keepy = 0
+	predown = 0
+	keeplongi = longi
+	keeplati = lati
 
+*main
+	curdown = 0	// ¡‰ñ‰º‚°‚©‚Ç‚¤‚©
+	mtlist idlist
+	num = stat
+	repeat num
+		mtinfo mt, idlist(cnt)
+		// ‚±‚±‚Åˆ—‚ð‚·‚é
+		down = mt(0)
+		tx = mt(1)
+		ty = mt(2)
+		iden = mt(3)
+		if down {
+			curdown = 1
+			curx = tx
+			cury = ty
+		}
+	loop
+
+	if predown {
+		if curdown {
+			// ˜A‘±‰º‚°
+			longi = - double(curx - keepx) + keeplongi
+			lati = double(cury - keepy) + keeplati
+		} else {
+			// ã‚°‚½’¼Œã
+		}
+	} else {
+		if curdown {
+			// V‚µ‚­‰º‚°‚½
+			keepx = curx
+			keepy = cury
+			keeplongi = longi
+			keeplati = lati
+		} else {
+			// ‰½‚à‚µ‚Ä‚¢‚È‚¢
+		}
+	}
+	if lati >= 90.0 {
+		lati = 90.0 - DELTA
+	}
+	if lati <= -90.0 {
+		lati = -90.0 + DELTA
+	}
+	predown = curdown
+	
+
+// ”¼Œa‚Ì•Ï“®
+    mw = mousew
+	radius += double(mw) * 0.2
+	
+	if radius < DELTA {
+		radius = DELTA
+	}
     premousew = mw
 
-    x = 0.5
-    y = guess_height * 0.5
-    z = guess_height * 2.0
+	//stick key, 0x0f | 0xffffff
+
+
+	lookat.0 = 0.0, guess_height * 0.5, 0.0
+
+	vang = lati * M_PI / 180.0
+	hang = longi * M_PI / 180.0
+	rr = cos(vang)
+
+	y = sin(vang)
+	z = rr * cos(hang)
+	x = rr * sin(hang)
+
+    x = x * radius + lookat.0
+    y = y * radius + lookat.1
+    z = z * radius + lookat.2
 
     redraw 0
 
@@ -54,7 +124,7 @@
     boxf
 
     setpos GPOBJ_CAMERA, x, y, z
-    gplookat GPOBJ_CAMERA, 0, guess_height * 0.5, 0
+    gplookat GPOBJ_CAMERA, lookat.0, lookat.1, lookat.2
 
     gpdraw
 
@@ -65,8 +135,10 @@
         color 255, 0, 0
         print errmsg
     } else {
-	    print "OK"
+	    print "OK" + radius
 	    print note
+	    print filepath
+	    print key
 	}
 
     redraw 1
