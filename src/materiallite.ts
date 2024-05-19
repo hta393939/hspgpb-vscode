@@ -6,6 +6,9 @@ import * as vscode from 'vscode';
 import { Disposable, disposeAll } from './dispose';
 import { getNonce } from './util';
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 interface MaterialLiteEdit {
     readonly color: string;
     readonly stroke: ReadonlyArray<[number, number]>;
@@ -293,7 +296,8 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		webviewPanel.webview.options = {
 			enableScripts: true,
 		};
-		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
+		const parsed = path.parse('');
+		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, parsed);
 
 		webviewPanel.webview.onDidReceiveMessage(e => this.onMessage(document, e));
 
@@ -341,7 +345,13 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 	/**
      * ページテキストを返す
 	 */
-	public getHtmlForWebview(webview: vscode.Webview): string {
+	public getHtmlForWebview(webview: vscode.Webview, parsed: path.ParsedPath): string {
+
+		const toBase64 = (buf: Buffer) => {
+			const code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+			return buf.toString('base64');
+		};
+
 		const base = webview.asWebviewUri(
 			vscode.Uri.joinPath(
 				this._context.extensionUri, 'media'
@@ -349,12 +359,64 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		);
 		const baseStr = base.toString() + '/';
 
+		// Use a nonce to whitelist which scripts can be run
+		const nonce = getNonce();
+
+		let ret = '<html><body>start! 3</body></html>';
+		let str = 'getHtmlForWebview<br />';
+		try {
+			let filepath0 = vscode.Uri.joinPath(
+				this._context.extensionUri, 'media', 'look_.html'
+			); // file:///C:\～で得られる
+
+			let fullname0 = path.join(
+				this._context.extensionPath, 'media', 'look_.html'
+			);
+
+			let uri0 = webview.asWebviewUri(filepath0);
+			ret = fs.readFileSync(fullname0, 'utf8');
+			//ret = buf.toString('utf8');
+
+			ret = ret.replace('/*BASEHREFPOSITION*/', baseStr);
+			ret = ret.replace('/*NONCEPOSITION*/', nonce);
+
+			//let fileuri1 = vscode.Uri.joinPath(
+			//	this._context.extensionUri, 'media', 'res', 'body_SD.png'
+			//);
+			let fullname1 = path.join(
+				this._context.extensionPath, 'media', 'res', 'body_SD.png'
+			);
+			//let uri1 = webview.asWebviewUri(vscode.Uri.joinPath(
+			//	this._context.extensionUri, 'media', 'res', 'body_SD.png'
+			//));
+			const buf1 = fs.readFileSync(fullname1, { encoding: null });
+			let insert = `var buf1 = "data:application/octet-stream;base64,${buf1.toString('base64')}";`;
+			insert += `Module['FS_createPreloadFile']('/', 'body_SD.png', buf1, true, true);`;
+			insert += `Module['FS_createPreloadFile']('/res', 'body_SD.png', buf1, true, true);`;
+			insert += `var buf2 = "data:application/octet-stream;base64,${buf1.toString('base64')}";`;
+			insert += `Module['FS_createPreloadFile']('/', 'head_SD.png', buf2, true, true);`;
+			insert += `Module['FS_createPreloadFile']('/res', 'head_SD.png', buf2, true, true);`;
+
+			let fullname3 = path.join(
+				this._context.extensionPath, 'media', 'look.ax'
+			);
+			const buf3 = fs.readFileSync(fullname3);
+			insert += `var buf3 = "data:application/octet-stream;base64,${buf3.toString('base64')}"`;
+			insert += `Module['FS_createPreloadFile']('/', 'look.ax', buf3, true, true);`;
+
+			ret = ret.replace('/*FSPOSITION*/', insert);
+
+		} catch(ec: unknown) {
+			str += `catch ${ec?.toString()}<br />`;
+		}
+
 		// Local path to script and css for the webview
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this._context.extensionUri, 'media', 'pawDraw.js'));
 
-		// Use a nonce to whitelist which scripts can be run
-		const nonce = getNonce();
+		vscode.window.showInformationMessage(str);
+
+		return ret;
 
 		return /* html */`
 			<!DOCTYPE html>
@@ -392,6 +454,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 					<button data-color="green" class="green" title="Green"></button>
 				</div>
 
+				<script nonce="${nonce}" src="hsp3dishw-gp.js"></script>
 				<script nonce="${nonce}" src="pawDraw.js"></script>
 			</body>
 			</html>`;

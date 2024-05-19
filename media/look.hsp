@@ -13,14 +13,21 @@
 	}
 	_s += _childname + "\r\n"
 	return _s
+
+#deffunc _statzero
+	return 0
+	
 #global
 
 #define DELTA (0.002)
+#const KEY_LBUT 0x100
+#const KEY_RBUT 0x200
+#const KEY_Z 0x800
 
     errmsg = ""
     gpreset
 
-    name = "tamane2.gpb"
+    //name = "tamane2.gpb"
     name = "tamane2"
 
     filepath = strf("%s", "res")
@@ -34,6 +41,7 @@
 	guess_height = max_y
     guess_height = 200.0
 
+	gosub *plane01
 
     radius = guess_height * 2.0
     longi = 0.0
@@ -48,21 +56,14 @@
 
 *main
 	curdown = 0	// ¡‰ñ‰º‚°‚©‚Ç‚¤‚©
-	mtlist idlist
-	num = stat
-	repeat num
-		mtinfo mt, idlist(cnt)
-		// ‚±‚±‚Åˆ—‚ğ‚·‚é
-		down = mt(0)
-		tx = mt(1)
-		ty = mt(2)
-		iden = mt(3)
-		if down {
-			curdown = 1
-			curx = tx
-			cury = ty
-		}
-	loop
+
+	stick key, 0x3ff
+	down = key & 256
+	if down {
+		curdown = 1
+		curx = mousex
+		cury = mousey
+	}
 
 	if predown {
 		if curdown {
@@ -204,3 +205,26 @@
 	
 	return
 
+
+*plane01
+	filepath = "res/body_SD.png"
+	exist filepath
+	if strsize > 0 {
+		gptexmat mtlid0, filepath
+		gpfloor id, 200, 200, -1, mtlid0
+	}
+
+	_statzero
+	mtlid1 = -999
+	filepath = "res/head_SD.png"
+	exist filepath
+	if strsize > 0 {
+		gptexmat mtlid1, filepath // stat ‚Í•ÏX‚µ‚È‚¢
+		//dialog strf("%08X", mtlid1)
+		gpbox id, 200, -1, mtlid1
+		if id >= 0 {
+			setpos id, 200, 0, 0
+		}
+	}
+
+	return

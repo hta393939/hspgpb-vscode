@@ -8,6 +8,8 @@ import { GpbLiteProvider } from './gpblite';
 
 import { MaterialLiteEditorProvider } from './materiallite';
 
+import * as path from 'node:path';
+
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(GpbLiteEditorProvider.register(context));
 
@@ -67,16 +69,17 @@ export function activate(context: vscode.ExtensionContext) {
       let text = doc?.getText();
       vscode.window.showInformationMessage(text ?? 'material undefined');
 
+      const parsed = path.parse(doc?.uri.toString() ?? '');
+
       const panel = vscode.window.createWebviewPanel(
         'hspgpb-vscode', // viewType
-        'titlesample2',
+        parsed.name,
         vscode.ViewColumn.Two,
         {}
       );
 
       const provider = new MaterialLiteEditorProvider(context);
-      panel.webview.html = provider.getHtmlForWebview(panel.webview);
-
+      panel.webview.html = provider.getHtmlForWebview(panel.webview, parsed);
     }));
   }
 
