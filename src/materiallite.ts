@@ -297,7 +297,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			enableScripts: true,
 		};
 		const parsed = path.parse('');
-		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, parsed);
+		webviewPanel.webview.html = await this.getHtmlForWebview(webviewPanel.webview, parsed, document.uri);
 
 		webviewPanel.webview.onDidReceiveMessage(e => this.onMessage(document, e));
 
@@ -345,11 +345,15 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 	/**
      * ページテキストを返す
 	 */
-	public getHtmlForWebview(webview: vscode.Webview, parsed: path.ParsedPath): string {
+	public async getHtmlForWebview(webview: vscode.Webview, parsed: path.ParsedPath, targetUri: vscode.Uri): Promise<string> {
 
-		const toBase64 = (buf: Buffer) => {
-			const code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-			return buf.toString('base64');
+		const _wrapping = (text: string) => {
+			const each = Array.from(text);
+			const ss: string[] = [];
+			while(each.length > 0) {
+				ss.push(each.splice(0, 76).join(''));
+			}
+			return ss.join('\n');
 		};
 
 		const base = webview.asWebviewUri(
@@ -362,49 +366,46 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
 
-		let ret = '<html><body>start! 3</body></html>';
-		let str = 'getHtmlForWebview<br />';
+		let ret = `<html><body>start! ${parsed.ext}4</body></html>`;
+		let str = 'mate<br />';
 		try {
-			let filepath0 = vscode.Uri.joinPath(
+			//const source = webview.cspSource.split(' ').filter(v => v !== `'self'`).join(' ');
+			const source = webview.cspSource;
+
+			const templateUri = vscode.Uri.joinPath(
 				this._context.extensionUri, 'media', 'look_.html'
-			); // file:///C:\～で得られる
-
-			let fullname0 = path.join(
-				this._context.extensionPath, 'media', 'look_.html'
 			);
+			const u8 = await vscode.workspace.fs.readFile(templateUri);
+			ret = new TextDecoder().decode(u8);
 
-			let uri0 = webview.asWebviewUri(filepath0);
-			ret = fs.readFileSync(fullname0, 'utf8');
-			//ret = buf.toString('utf8');
+			ret = ret.replace(/\/\*BASEHREFPOSITION\*\//, baseStr);
+			ret = ret.replace(/\/\*NONCEPOSITION\*\//g, nonce);
+			ret = ret.replace(/\/\*CSPPOSITION\*\//g, source);
 
-			ret = ret.replace('/*BASEHREFPOSITION*/', baseStr);
-			ret = ret.replace('/*NONCEPOSITION*/', nonce);
+			vscode.window.showInformationMessage(`csp ${webview.cspSource} ${source} ${targetUri.toString()}`);
 
-			//let fileuri1 = vscode.Uri.joinPath(
-			//	this._context.extensionUri, 'media', 'res', 'body_SD.png'
-			//);
+/*
 			let fullname1 = path.join(
 				this._context.extensionPath, 'media', 'res', 'body_SD.png'
 			);
-			//let uri1 = webview.asWebviewUri(vscode.Uri.joinPath(
-			//	this._context.extensionUri, 'media', 'res', 'body_SD.png'
-			//));
 			const buf1 = fs.readFileSync(fullname1, { encoding: null });
-			let insert = `var buf1 = "data:application/octet-stream;base64,${buf1.toString('base64')}";`;
-			insert += `Module['FS_createPreloadFile']('/', 'body_SD.png', buf1, true, true);`;
-			insert += `Module['FS_createPreloadFile']('/res', 'body_SD.png', buf1, true, true);`;
-			insert += `var buf2 = "data:application/octet-stream;base64,${buf1.toString('base64')}";`;
-			insert += `Module['FS_createPreloadFile']('/', 'head_SD.png', buf2, true, true);`;
-			insert += `Module['FS_createPreloadFile']('/res', 'head_SD.png', buf2, true, true);`;
+			let insert = `var buf1 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
+			insert += `Module['FS_createPreloadFile']('/', 'body_SD.png', buf1, true, true);\n`;
+			insert += `Module['FS_createPreloadFile']('/res', 'body_SD.png', buf1, true, true);\n`;
+			insert += `var buf2 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
+			insert += `Module['FS_createPreloadFile']('/', 'head_SD.png', buf2, true, true);\n`;
+			insert += `Module['FS_createPreloadFile']('/res', 'head_SD.png', buf2, true, true);\n`;
+*/
 
+/*
 			let fullname3 = path.join(
 				this._context.extensionPath, 'media', 'look.ax'
 			);
 			const buf3 = fs.readFileSync(fullname3);
-			insert += `var buf3 = "data:application/octet-stream;base64,${buf3.toString('base64')}"`;
-			insert += `Module['FS_createPreloadFile']('/', 'look.ax', buf3, true, true);`;
-
-			ret = ret.replace('/*FSPOSITION*/', insert);
+			insert += `var buf3 = "data:application/octet-stream;base64,${buf3.toString('base64')}"\n`;
+			insert += `Module['FS_createPreloadFile']('/', 'look.ax', buf3, true, true);\n`;
+*/
+			//ret = ret.replace('/*FSPOSITION*/', insert);
 
 		} catch(ec: unknown) {
 			str += `catch ${ec?.toString()}<br />`;

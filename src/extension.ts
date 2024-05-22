@@ -61,7 +61,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   {
     const name = 'hspgpb-vscode.bar';
-    context.subscriptions.push(vscode.commands.registerCommand(name, () => {
+    context.subscriptions.push(vscode.commands.registerCommand(name, async (...commandArgs) => {
+      const first = commandArgs[0];
+      const second = commandArgs[1];
+      let parsed = path.parse('');
+      if (first instanceof vscode.Uri) {
+        parsed = path.parse(first.toString());
+      }
       vscode.window.showInformationMessage(`bar ${name}`);
 
       const editor = vscode.window.activeTextEditor;
@@ -69,17 +75,19 @@ export function activate(context: vscode.ExtensionContext) {
       let text = doc?.getText();
       vscode.window.showInformationMessage(text ?? 'material undefined');
 
-      const parsed = path.parse(doc?.uri.toString() ?? '');
+      //parsed = path.parse(doc?.uri.toString() ?? '');
 
       const panel = vscode.window.createWebviewPanel(
         'hspgpb-vscode', // viewType
         parsed.name,
         vscode.ViewColumn.Two,
-        {}
+        {
+          enableScripts: true, // 重要
+        }
       );
 
       const provider = new MaterialLiteEditorProvider(context);
-      panel.webview.html = provider.getHtmlForWebview(panel.webview, parsed);
+      panel.webview.html = await provider.getHtmlForWebview(panel.webview, parsed, first);
     }));
   }
 
