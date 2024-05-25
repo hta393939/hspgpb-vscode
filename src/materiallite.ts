@@ -346,15 +346,6 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 	 */
 	public async getHtmlForWebview(webview: vscode.Webview, targetUri: vscode.Uri): Promise<string> {
 
-		const _wrapping = (text: string) => {
-			const each = Array.from(text);
-			const ss: string[] = [];
-			while(each.length > 0) {
-				ss.push(each.splice(0, 76).join(''));
-			}
-			return ss.join('\n');
-		};
-
 		const base = webview.asWebviewUri(
 			vscode.Uri.joinPath(
 				this._context.extensionUri, 'media'
@@ -368,10 +359,24 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		let ret = `<html><body>start! 5</body></html>`;
 		let str = 'mate<br />';
 
+		let fsPosition = '/* emscripten empty replace */';
 		try {
-			await this.parseMaterial(targetUri);
-		} catch (ec) {
+			const result = await this.parseMaterial(targetUri);
+			fsPosition = result.emsFiles.map(files => {
+				const lines: string[] = [
+					`Module['FS_createPath']('/', '${files.emsDir}', true, true);`,
+					`Module['FS_createPreloadedFile']('/', '${files.emsFilename}', '${webview.asWebviewUri(files.uri).toString()}', true, true);`,
+				];
+				return lines.join('\n');
+			}).join('\n');
 
+			fsPosition += `var _name = ${result.name};\n`;
+			fsPosition += `var _buf = new TextEncoder().encode(_name);`;
+			fsPosition += `Module['FS_createPreloadedFile']('/', 'name.txt', _buf, true, true);\n`;
+
+		} catch (ec) {
+			vscode.window.showWarningMessage(`Error occured`);
+			return `Error occured`;
 		}
 
 		try {
@@ -384,33 +389,14 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			const u8 = await vscode.workspace.fs.readFile(templateUri);
 			ret = new TextDecoder().decode(u8);
 
-			ret = ret.replace(/\/\*BASEHREFPOSITION\*\//, baseStr);
+			ret = ret.replace('/*BASEHREFPOSITION*/', baseStr);
 			ret = ret.replace(/\/\*NONCEPOSITION\*\//g, nonce);
 			ret = ret.replace(/\/\*CSPPOSITION\*\//g, source);
 
-			//vscode.window.showInformationMessage(`csp ${webview.cspSource} ${source} ${targetUri.toString()}`);
-
-			//let insert = `var buf1 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
-			/*
-			insert += `Module['FS_createPreloadFile']('/', 'body_SD.png', buf1, true, true);\n`;
-			insert += `Module['FS_createPreloadFile']('/res', 'body_SD.png', buf1, true, true);\n`;
-			insert += `var buf2 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
-			insert += `Module['FS_createPreloadFile']('/', 'head_SD.png', buf2, true, true);\n`;
-			insert += `Module['FS_createPreloadFile']('/res', 'head_SD.png', buf2, true, true);\n`;
-*/
-
-/*
-			let fullname3 = path.join(
-				this._context.extensionPath, 'media', 'look.ax'
-			);
-			const buf3 = fs.readFileSync(fullname3);
-			insert += `var buf3 = "data:application/octet-stream;base64,${buf3.toString('base64')}"\n`;
-			insert += `Module['FS_createPreloadFile']('/', 'look.ax', buf3, true, true);\n`;
-*/
-			//ret = ret.replace('/*FSPOSITION*/', insert);
+			ret = ret.replace('/*FSPOSITION*/', fsPosition);
 
 		} catch(ec: unknown) {
-			str += `catch ${ec?.toString()}<br />`;
+			str += `catch ${ec?.toString()}`;
 		}
 
 		//vscode.window.showInformationMessage(str);
@@ -470,6 +456,15 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			return vscode.Uri.parse(path.dirname(uri.path));
 		};
 
+		const ret = {
+			name: '',
+			emsFiles: [] as {emsFilename: string, emsDir: string, uri: vscode.Uri}[]
+		};
+
+		const gpbUri = targetUri.with({
+			path: targetUri.path.replace(/\.(material|gpb)$/, '.gpb'),
+		});
+
 		const materialUri = targetUri.with({
 			path: targetUri.path.replace(/\.(material|gpb)$/, '.material'),
 		});
@@ -485,13 +480,21 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			// shiftjis
 		}
 
-		// あかん;; 正しく分解するには??
 		const wsLayers = modelDirUri.path.split('/');
-		//const wsLayers = modelDirUri.path.split('\\');
 
-		//const wsResIndex = wsLayers.lastIndexOf('res');
+// 2つのファイルを登録する
+		for (const uri of [gpbUri, materialUri]) {
+			const parsed = path.parse(uri.fsPath);
+			ret.name = parsed.name;
 
-		const images: string[] = [];
+			const emsFile = {
+				emsDir: '/',
+				emsFilename: `${parsed.base}`,
+				uri,
+			};
+			ret.emsFiles.push(emsFile);
+		}
+
 		const lines = text.split('\n').map(line => line.trim());
 		//str += `p,${lines.length},`;
 		const reExt = /(?<ext>\.[^.]*)$/;
@@ -515,8 +518,19 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 						modelDirUri, ...layers,
 					);
 
-					const u8buf = await vscode.workspace.fs.readFile(candUri);
-					str += `, ${candUri.toString()}\\n`;
+					const stat = await vscode.workspace.fs.stat(candUri);
+					str += `, ${candUri.toString()} ${stat.size}\\n`;
+
+					const emsFile = {
+						emsFilename: val,
+						emsDir: '/',
+						uri: candUri,
+					};
+					if (layers.length >= 2) {
+						layers.pop();
+						emsFile.emsDir = '/' + layers.join('/');
+					}
+					ret.emsFiles.push(emsFile);
 				} catch (ec) {
 					str += `, ${ec?.toString()}\\n`;
 				}
@@ -535,43 +549,29 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 							guessDirUri, ...layers,
 						);
 
-						const u8buf = await vscode.workspace.fs.readFile(candUri);
-						str += `, ${candUri.toString()}\\n`;
+						const stat = await vscode.workspace.fs.stat(candUri);
+						str += `, ${candUri.toString()} ${stat.size}\\n`;
+						const emsFile = {
+							emsDir: '/',
+							emsFilename: val,
+							uri: candUri,
+						};
+						if (layers.length >= 2) {
+							layers.pop();
+							emsFile.emsDir = '/' + layers.join('/');
+						}
+						ret.emsFiles.push(emsFile);
 						break;
 					} catch (ec) {
 						str += `, ${ec?.toString()}\\n`;
 					}
 					//vscode.window.showInformationMessage(`up ${candUri.toString()}`);
+				}
+			}
+		}
 
-					//const stat = await vscode.workspace.fs.stat(candUri);
-				}
-			}
-		}
-/*
-		for (const imagename of images) {
-			const cands: {uri: vscode.Uri, emsfs: string}[] = [];
-			{
-				const cand = {
-					uri: vscode.Uri.from({
-						scheme: targetUri.scheme,
-						path: targetUri.path,
-					}),
-					emsfs: ``,
-				};
-				cands.push(cand);
-			}
-			for (const cand of cands) {
-				try {
-					const u8buf = await vscode.workspace.fs.readFile(cand.uri);
-					//vscode.window.showInformationMessage(`${u8buf.byteLength}, ${cand.uri.path}`);
-					break;
-				} catch (ec) {
-					continue;
-				}
-			}
-		}
-*/
 		vscode.window.showInformationMessage(str);
+		return ret;
 	}
 
 
