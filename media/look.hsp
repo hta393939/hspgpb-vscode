@@ -33,11 +33,11 @@
     errmsg = ""
 	name = ""
 
-	/*
+
 	notesel note
 
 	exist "_name.txt"
-	if refsize > 0 {
+	if strsize > 0 {
 		noteload "_name.txt", 4000
 		noteget name, 0
 
@@ -47,8 +47,8 @@
     	}
     } else {
 	    errmsg = "Internal error"
-	}*/
-	gpload id, "tamane2"
+	}
+	//gpload id, "tamane2"
 	//gpload id, "res/tamane2"
 
 	gosub *guessheight
