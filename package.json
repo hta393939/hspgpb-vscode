@@ -20,15 +20,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "hspgpb-vscode.corge",
-        "title": "HSPGPB: corge"
-      },
-      {
-        "command": "hspgpb-vscode.helloWorld",
-        "title": "HSPGPB: Hello World",
-        "category": "HSP"
-      },
-      {
         "command": "hspgpb-vscode.pawDraw.new",
         "title": "HSPGPB: Create new gpb Document",
         "category": "HSP"
@@ -49,20 +40,20 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "resourceLangId === hspgpb-vscode.material",
+          "when": "resourceExtname == .gpb",
           "command": "hspgpb-vscode.bar",
           "group": "HSPGPB@1"
+        },
+        {
+          "when": "resourceLangId === hspgpb-vscode.material",
+          "command": "hspgpb-vscode.bar",
+          "group": "HSPGPB@2"
         }
       ],
       "editor/context": [
         {
           "when": "resourceLangId == hspgpb-vscode.material",
           "command": "hspgpb-vscode.foo",
-          "group": "HSPGPB@1"
-        },
-        {
-          "when": "resourceLangId === hspgpb-vscode.material",
-          "command": "hspgpb-vscode.bar",
           "group": "HSPGPB@2"
         }
       ]

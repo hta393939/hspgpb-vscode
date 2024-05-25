@@ -24,18 +24,32 @@
 #const KEY_RBUT 0x200
 #const KEY_Z 0x800
 
+	gpreset
+
+	id = -1
+	key = 0
+	max_y = -999
+	sdim note, 4096
     errmsg = ""
-    gpreset
+	name = ""
 
-    //name = "tamane2.gpb"
-    name = "tamane2"
+	/*
+	notesel note
 
-    filepath = strf("%s", "res")
-    filepath += strf("/%s", name)
-    gpload id, filepath
-    if (id < 0) {
-        errmsg = "gpload error"
-    }
+	exist "_name.txt"
+	if refsize > 0 {
+		noteload "_name.txt", 4000
+		noteget name, 0
+
+	    gpload id, name
+    	if (id < 0) {
+        	errmsg = "gpload error, " + name
+    	}
+    } else {
+	    errmsg = "Internal error"
+	}*/
+	gpload id, "tamane2"
+	//gpload id, "res/tamane2"
 
 	gosub *guessheight
 	guess_height = max_y
@@ -148,18 +162,20 @@
 
 
 *guessheight
-	note = ""
 	notesel note
 	max_y = 0.0
 
+	nodename = ""
 	gpnodeinfo nodename, id, GPNODEINFO_NAME
 	noteadd strf("n, %s", nodename)
 
+	skinrootname = ""
 	gpnodeinfo skinrootname, id, GPNODEINFO_SKINROOT, ""
 	noteadd strf("sr, %s", skinrootname)
 
 	nodename = skinrootname
 
+	childname = ""
 	gpnodeinfo childname, id, GPNODEINFO_CHILD, nodename
 	if stat < 0 {
 	}
@@ -167,6 +183,7 @@
 
 	eldername = childname
 *guessheight5
+	sibname = ""
 	repeat 10
 		gpnodeinfo sibname, id, GPNODEINFO_SIBLING, eldername
 		if stat >= 0 & sibname != "" {
@@ -193,6 +210,7 @@
 		noteget nodename, cnt
 
 //	nodename = "asi_L_"
+		infonode = ""
 		gpnodeinfo infonode, id, GPNODEINFO_NODE, nodename
 		if infonode > 0 {
 			getpos infonode, x, y, z
@@ -210,6 +228,7 @@
 	filepath = "res/body_SD.png"
 	exist filepath
 	if strsize > 0 {
+		mtlid0 = -1
 		gptexmat mtlid0, filepath
 		gpfloor id, 200, 200, -1, mtlid0
 	}

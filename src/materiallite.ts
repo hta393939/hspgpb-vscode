@@ -370,9 +370,11 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 				return lines.join('\n');
 			}).join('\n');
 
-			fsPosition += `var _name = ${result.name};\n`;
-			fsPosition += `var _buf = new TextEncoder().encode(_name);`;
-			fsPosition += `Module['FS_createPreloadedFile']('/', 'name.txt', _buf, true, true);\n`;
+			fsPosition += `\nvar _name = '${result.name}';\n`;
+			fsPosition += `var _buf = new TextEncoder().encode(_name);\n`;
+			fsPosition += `Module['FS_createPreloadedFile']('/', '_name.txt', _buf, true, true);\n`;
+
+			//fsPosition += `Module['FS_createPreloadedFile']('/', 'look.ax', './look.ax', true, true)`;
 
 		} catch (ec) {
 			vscode.window.showWarningMessage(`Error occured`);
@@ -380,17 +382,23 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		}
 
 		try {
-			//const source = webview.cspSource.split(' ').filter(v => v !== `'self'`).join(' ');
 			const source = webview.cspSource;
 
 			const templateUri = vscode.Uri.joinPath(
-				this._context.extensionUri, 'media', 'look_.html'
+				this._context.extensionUri, 'media', 'look.html'
 			);
 			const u8 = await vscode.workspace.fs.readFile(templateUri);
 			ret = new TextDecoder().decode(u8);
 
 			ret = ret.replace('/*BASEHREFPOSITION*/', baseStr);
+
 			ret = ret.replace(/\/\*NONCEPOSITION\*\//g, nonce);
+
+			const styleNonce = `<style nonce="${nonce}" `;
+			ret = ret.replace(/\<style/g, styleNonce);
+			const scriptNonce = `<script nonce="${nonce}" `;
+			ret = ret.replace(/\<script\s/g, scriptNonce);
+
 			ret = ret.replace(/\/\*CSPPOSITION\*\//g, source);
 
 			ret = ret.replace('/*FSPOSITION*/', fsPosition);
@@ -450,7 +458,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
  * @param targetUri 
  */
 	public async parseMaterial(targetUri: vscode.Uri) {
-		let str = 'p, ';
+		let str = 'p1,';
 
 		const dirname = (uri: vscode.Uri) => {
 			return vscode.Uri.parse(path.dirname(uri.path));
@@ -531,6 +539,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 						emsFile.emsDir = '/' + layers.join('/');
 					}
 					ret.emsFiles.push(emsFile);
+					continue;
 				} catch (ec) {
 					str += `, ${ec?.toString()}\\n`;
 				}
