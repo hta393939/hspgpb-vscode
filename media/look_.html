@@ -315,6 +315,48 @@ Module['FS_createPath']('/res', 'shaders', true, true);
       },
     };
 
+    {
+      new DataRequest(0, 2883, 0, 0).open('GET', 'look.ax');
+      new DataRequest(2883, 145069, 0, 0).open('GET', 'res/body_SD.png');
+      new DataRequest(145069, 229023, 0, 0).open('GET', 'res/head_SD.png');
+      new DataRequest(229023, 324627, 0, 0).open('GET', 'res/tamane2.gpb');
+      new DataRequest(324627, 325994, 0, 0).open('GET', 'res/tamane2.material');
+      new DataRequest(325994, 329010, 0, 0).open('GET', 'res/shaders/colored.frag');
+      new DataRequest(329010, 332170, 0, 0).open('GET', 'res/shaders/colored.vert');
+      new DataRequest(332170, 333035, 0, 0).open('GET', 'res/shaders/font.frag');
+      new DataRequest(333035, 333544, 0, 0).open('GET', 'res/shaders/font.vert');
+      new DataRequest(333544, 336835, 0, 0).open('GET', 'res/shaders/lighting.frag');
+      new DataRequest(336835, 339131, 0, 0).open('GET', 'res/shaders/lighting.vert');
+      new DataRequest(339131, 340470, 0, 0).open('GET', 'res/shaders/p_blur.frag');
+      new DataRequest(340470, 341281, 0, 0).open('GET', 'res/shaders/p_blur2.frag');
+      new DataRequest(341281, 342207, 0, 0).open('GET', 'res/shaders/p_blur2.vert');
+      new DataRequest(342207, 342732, 0, 0).open('GET', 'res/shaders/p_bright.frag');
+      new DataRequest(342732, 343338, 0, 0).open('GET', 'res/shaders/p_contrast.frag');
+      new DataRequest(343338, 344336, 0, 0).open('GET', 'res/shaders/p_crtmonitor.frag');
+      new DataRequest(344336, 345673, 0, 0).open('GET', 'res/shaders/p_crtmonitor2.frag');
+      new DataRequest(345673, 346568, 0, 0).open('GET', 'res/shaders/p_cutoff.frag');
+      new DataRequest(346568, 347141, 0, 0).open('GET', 'res/shaders/p_grayscale.frag');
+      new DataRequest(347141, 347793, 0, 0).open('GET', 'res/shaders/p_mosaic.frag');
+      new DataRequest(347793, 352585, 0, 0).open('GET', 'res/shaders/p_oldfilm.frag');
+      new DataRequest(352585, 353311, 0, 0).open('GET', 'res/shaders/p_sepia.frag');
+      new DataRequest(353311, 354770, 0, 0).open('GET', 'res/shaders/p_sobel.frag');
+      new DataRequest(354770, 355980, 0, 0).open('GET', 'res/shaders/simpletex.frag');
+      new DataRequest(355980, 357013, 0, 0).open('GET', 'res/shaders/simpletex.vert');
+      new DataRequest(357013, 357255, 0, 0).open('GET', 'res/shaders/skinning-none.vert');
+      new DataRequest(357255, 359626, 0, 0).open('GET', 'res/shaders/skinning.vert');
+      new DataRequest(359626, 360888, 0, 0).open('GET', 'res/shaders/skybox.frag');
+      new DataRequest(360888, 362114, 0, 0).open('GET', 'res/shaders/skybox.vert');
+      new DataRequest(362114, 362559, 0, 0).open('GET', 'res/shaders/sprite.frag');
+      new DataRequest(362559, 363067, 0, 0).open('GET', 'res/shaders/sprite.vert');
+      new DataRequest(363067, 363305, 0, 0).open('GET', 'res/shaders/spritecol.frag');
+      new DataRequest(363305, 363552, 0, 0).open('GET', 'res/shaders/spritecol.vert');
+      new DataRequest(363552, 367410, 0, 0).open('GET', 'res/shaders/terrain.frag');
+      new DataRequest(367410, 370006, 0, 0).open('GET', 'res/shaders/terrain.vert');
+      new DataRequest(370006, 373420, 0, 0).open('GET', 'res/shaders/textured.frag');
+      new DataRequest(373420, 377586, 0, 0).open('GET', 'res/shaders/textured.vert');
+      new DataRequest(377586, 380986, 0, 0).open('GET', 'res/shaders/textured_gray.frag');
+    }
+
     function processPackageData(arrayBuffer) {
       Module.finishedDataFileDownloads++;
       assert(arrayBuffer, 'Loading data file failed.');
@@ -327,6 +369,47 @@ Module['FS_createPath']('/res', 'shaders', true, true);
       DataRequest.prototype.byteArray = Module['HEAPU8'].subarray(ptr, ptr+byteArray.length);
 
           //DataRequest.prototype.requests["look.ax"].onload();
+      {
+          DataRequest.prototype.requests["look.ax"].onload();
+          DataRequest.prototype.requests["res/body_SD.png"].onload();
+          DataRequest.prototype.requests["res/head_SD.png"].onload();
+          DataRequest.prototype.requests["res/tamane2.gpb"].onload();
+          DataRequest.prototype.requests["res/tamane2.material"].onload();
+          DataRequest.prototype.requests["res/shaders/colored.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/colored.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/font.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/font.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/lighting.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/lighting.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/p_blur.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_blur2.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_blur2.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/p_bright.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_contrast.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_crtmonitor.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_crtmonitor2.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_cutoff.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_grayscale.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_mosaic.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_oldfilm.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_sepia.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/p_sobel.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/simpletex.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/simpletex.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/skinning-none.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/skinning.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/skybox.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/skybox.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/sprite.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/sprite.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/spritecol.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/spritecol.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/terrain.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/terrain.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/textured.frag"].onload();
+          DataRequest.prototype.requests["res/shaders/textured.vert"].onload();
+          DataRequest.prototype.requests["res/shaders/textured_gray.frag"].onload();
+      }
 
           Module['removeRunDependency']('datafile_look.data');
 

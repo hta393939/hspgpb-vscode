@@ -296,8 +296,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		webviewPanel.webview.options = {
 			enableScripts: true,
 		};
-		const parsed = path.parse('');
-		webviewPanel.webview.html = await this.getHtmlForWebview(webviewPanel.webview, parsed, document.uri);
+		webviewPanel.webview.html = await this.getHtmlForWebview(webviewPanel.webview, document.uri);
 
 		webviewPanel.webview.onDidReceiveMessage(e => this.onMessage(document, e));
 
@@ -345,7 +344,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 	/**
      * ページテキストを返す
 	 */
-	public async getHtmlForWebview(webview: vscode.Webview, parsed: path.ParsedPath, targetUri: vscode.Uri): Promise<string> {
+	public async getHtmlForWebview(webview: vscode.Webview, targetUri: vscode.Uri): Promise<string> {
 
 		const _wrapping = (text: string) => {
 			const each = Array.from(text);
@@ -366,8 +365,15 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
 
-		let ret = `<html><body>start! ${parsed.ext}4</body></html>`;
+		let ret = `<html><body>start! 5</body></html>`;
 		let str = 'mate<br />';
+
+		try {
+			await this.parseMaterial(targetUri);
+		} catch (ec) {
+
+		}
+
 		try {
 			//const source = webview.cspSource.split(' ').filter(v => v !== `'self'`).join(' ');
 			const source = webview.cspSource;
@@ -382,14 +388,10 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			ret = ret.replace(/\/\*NONCEPOSITION\*\//g, nonce);
 			ret = ret.replace(/\/\*CSPPOSITION\*\//g, source);
 
-			vscode.window.showInformationMessage(`csp ${webview.cspSource} ${source} ${targetUri.toString()}`);
+			//vscode.window.showInformationMessage(`csp ${webview.cspSource} ${source} ${targetUri.toString()}`);
 
-/*
-			let fullname1 = path.join(
-				this._context.extensionPath, 'media', 'res', 'body_SD.png'
-			);
-			const buf1 = fs.readFileSync(fullname1, { encoding: null });
-			let insert = `var buf1 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
+			//let insert = `var buf1 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
+			/*
 			insert += `Module['FS_createPreloadFile']('/', 'body_SD.png', buf1, true, true);\n`;
 			insert += `Module['FS_createPreloadFile']('/res', 'body_SD.png', buf1, true, true);\n`;
 			insert += `var buf2 = "data:application/octet-stream;base64,${_wrapping(buf1.toString('base64'))}";\n`;
@@ -411,12 +413,7 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			str += `catch ${ec?.toString()}<br />`;
 		}
 
-		// Local path to script and css for the webview
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this._context.extensionUri, 'media', 'pawDraw.js'));
-
-		vscode.window.showInformationMessage(str);
-
+		//vscode.window.showInformationMessage(str);
 		return ret;
 
 		return /* html */`
@@ -460,6 +457,124 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			</body>
 			</html>`;
 	}
+
+/**
+ * .material ファイルの画像を取り出す
+ * show に <br /> 効かない
+ * @param targetUri 
+ */
+	public async parseMaterial(targetUri: vscode.Uri) {
+		let str = 'p, ';
+
+		const dirname = (uri: vscode.Uri) => {
+			return vscode.Uri.parse(path.dirname(uri.path));
+		};
+
+		const materialUri = targetUri.with({
+			path: targetUri.path.replace(/\.(material|gpb)$/, '.material'),
+		});
+
+		//vscode.window.showInformationMessage(`parse ${materialUri.toString()}`);
+
+		const modelDirUri = dirname(materialUri);
+		const u8buf = await vscode.workspace.fs.readFile(materialUri);
+		let text = '';
+		try {
+			text = new TextDecoder().decode(u8buf);
+		} catch (ec) {
+			// shiftjis
+		}
+
+		// あかん;; 正しく分解するには??
+		const wsLayers = modelDirUri.path.split('/');
+		//const wsLayers = modelDirUri.path.split('\\');
+
+		//const wsResIndex = wsLayers.lastIndexOf('res');
+
+		const images: string[] = [];
+		const lines = text.split('\n').map(line => line.trim());
+		//str += `p,${lines.length},`;
+		const reExt = /(?<ext>\.[^.]*)$/;
+
+		for (const line of lines) {
+			const ss = line.split('=').map(v => v.trim());
+			if (ss.length !== 2) {
+				continue;
+			}
+			const [key, val] = ss;
+			const m = reExt.exec(val);
+			const ext = m?.groups?.['ext'];
+			if (ext !== '.png') {
+				continue;
+			}
+			
+			const layers = val.split('/');
+			{ // モデル基準
+				try {
+					const candUri = vscode.Uri.joinPath(
+						modelDirUri, ...layers,
+					);
+
+					const u8buf = await vscode.workspace.fs.readFile(candUri);
+					str += `, ${candUri.toString()}\\n`;
+				} catch (ec) {
+					str += `, ${ec?.toString()}\\n`;
+				}
+				vscode.window.showInformationMessage(`model, ${str}`);
+			}
+
+			{ // 1つずつ上がっていく
+				while(wsLayers.length > 0) {
+					try {
+						wsLayers.pop();
+						
+						const guessDirUri = modelDirUri.with({
+							path: wsLayers.join('/'),
+						});
+						const candUri = vscode.Uri.joinPath(
+							guessDirUri, ...layers,
+						);
+
+						const u8buf = await vscode.workspace.fs.readFile(candUri);
+						str += `, ${candUri.toString()}\\n`;
+						break;
+					} catch (ec) {
+						str += `, ${ec?.toString()}\\n`;
+					}
+					//vscode.window.showInformationMessage(`up ${candUri.toString()}`);
+
+					//const stat = await vscode.workspace.fs.stat(candUri);
+				}
+			}
+		}
+/*
+		for (const imagename of images) {
+			const cands: {uri: vscode.Uri, emsfs: string}[] = [];
+			{
+				const cand = {
+					uri: vscode.Uri.from({
+						scheme: targetUri.scheme,
+						path: targetUri.path,
+					}),
+					emsfs: ``,
+				};
+				cands.push(cand);
+			}
+			for (const cand of cands) {
+				try {
+					const u8buf = await vscode.workspace.fs.readFile(cand.uri);
+					//vscode.window.showInformationMessage(`${u8buf.byteLength}, ${cand.uri.path}`);
+					break;
+				} catch (ec) {
+					continue;
+				}
+			}
+		}
+*/
+		vscode.window.showInformationMessage(str);
+	}
+
+
 
 	private _requestId = 1;
 	private readonly _callbacks = new Map<number, (response: any) => void>();
