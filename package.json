@@ -62,8 +62,8 @@
     },
     "customEditors": [
       {
-        "viewType": "hspgpb-vscode.gpblite",
-        "displayName": "HSPGPB: lite .gpb file previewer",
+        "viewType": "hspgpb-vscode.gpbpreview",
+        "displayName": "HSPGPB: preview gpb file",
         "selector": [
           {
             "filenamePattern": "*.gpb"

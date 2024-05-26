@@ -8,13 +8,14 @@ import { GpbLiteProvider } from './gpblite';
 
 import { MaterialLiteEditorProvider } from './materiallite';
 import { PreviewCode } from './previewcode';
+import { GpbPreviewProvider } from './gpbpreview';
 
 import * as path from 'node:path';
 
 export function activate(context: vscode.ExtensionContext) {
-  context.subscriptions.push(GpbLiteEditorProvider.register(context));
-
+  //context.subscriptions.push(GpbLiteEditorProvider.register(context));
   context.subscriptions.push(GpbLiteProvider.register(context));
+  context.subscriptions.push(GpbPreviewProvider.register(context));
 
   { // commands に記載したコマンドの実装
     const name = 'hspgpb-vscode.material';
