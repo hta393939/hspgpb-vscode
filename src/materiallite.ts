@@ -515,8 +515,16 @@ export class MaterialLiteEditorProvider implements vscode.CustomEditorProvider<M
 			const [key, val] = ss;
 			const m = reExt.exec(val);
 			const ext = m?.groups?.['ext'];
-			if (ext !== '.png') {
-				continue;
+			switch(ext) {
+			case '.png':
+				// 処理を続ける
+				break;
+			//case '.vert':
+			//case '.frag':
+				// Do nothing.
+				//break;
+			default:
+				continue; // 非対象
 			}
 			
 			const layers = val.split('/');

@@ -46,33 +46,20 @@
         {
           "when": "resourceExtname == .gpb",
           "command": "hspgpb-vscode.viewgpblite",
+          "group": "HSPGPB@1"
+        },
+        {
+          "when": "resourceExtname == .gpb",
+          "command": "hspgpb-vscode.bar",
           "group": "HSPGPB@2"
         },
         {
-          "when": "resourceLangId === hspgpb-vscode.material",
+          "when": "resourceExtname == .material",
           "command": "hspgpb-vscode.bar",
-          "group": "HSPGPB@1"
-        }
-      ],
-      "editor/context": [
-        {
-          "when": "resourceLangId == hspgpb-vscode.material",
-          "command": "hspgpb-vscode.foo",
           "group": "HSPGPB@3"
         }
       ]
     },
-    "languages": [
-      {
-        "id": "hspgpb-vscode.material",
-        "aliases": [
-          "material for gpb"
-        ],
-        "extensions": [
-          ".material"
-        ]
-      }
-    ],
     "customEditors": [
       {
         "viewType": "hspgpb-vscode.gpblite",

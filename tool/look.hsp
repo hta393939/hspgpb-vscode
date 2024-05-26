@@ -33,6 +33,7 @@
     errmsg = ""
 	name = ""
 
+/*PARAMETERPOSITION*/
 
 	notesel note
 
@@ -65,7 +66,7 @@
 	keeplati = lati
 
 *main
-	curdown = 0	// ¡‰ñ‰º‚°‚©‚Ç‚¤‚©
+	curdown = 0	// ï¿½ï¿½ï¿½ñ‰º‚ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½
 
 	stick key, 0x3ff
 	down = key & 256
@@ -77,21 +78,21 @@
 
 	if predown {
 		if curdown {
-			// ˜A‘±‰º‚°
+			// ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			longi = - double(curx - keepx) + keeplongi
 			lati = double(cury - keepy) + keeplati
 		} else {
-			// ã‚°‚½’¼Œã
+			// ï¿½ã‚°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		}
 	} else {
 		if curdown {
-			// V‚µ‚­‰º‚°‚½
+			// ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			keepx = curx
 			keepy = cury
 			keeplongi = longi
 			keeplati = lati
 		} else {
-			// ‰½‚à‚µ‚Ä‚¢‚È‚¢
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½
 		}
 	}
 	if lati >= 90.0 {
@@ -103,7 +104,7 @@
 	predown = curdown
 	
 
-// ”¼Œa‚Ì•Ï“®
+// ï¿½ï¿½ï¿½aï¿½Ì•Ï“ï¿½
     mw = mousew
 	radius += double(mw) * 0.2
 	
