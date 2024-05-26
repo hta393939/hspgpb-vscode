@@ -7,6 +7,7 @@ import { exec } from 'node:child_process';
 import { GpbLiteProvider } from './gpblite';
 
 import { MaterialLiteEditorProvider } from './materiallite';
+import { PreviewCode } from './previewcode';
 
 import * as path from 'node:path';
 
@@ -37,10 +38,16 @@ export function activate(context: vscode.ExtensionContext) {
     }));
   }
 
-  { // commands
+  { // commands hsp ファイル生成
     const name = 'hspgpb-vscode.foo';
-    context.subscriptions.push(vscode.commands.registerCommand(name, () => {
-      vscode.window.showInformationMessage(`material ${name}`);
+    context.subscriptions.push(vscode.commands.registerCommand(name, (...commandArgs) => {
+      vscode.window.showInformationMessage(`foo ${name}`);
+
+      const [first, second] = commandArgs;
+      if (first instanceof vscode.Uri) {
+        const previewCode = new PreviewCode(context);
+        previewCode.make(first, second);
+      }
     }));
   }
 

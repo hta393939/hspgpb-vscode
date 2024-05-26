@@ -48,14 +48,10 @@
     } else {
 	    errmsg = "Internal error"
 	}
-	//gpload id, "tamane2"
-	//gpload id, "res/tamane2"
 
 	gosub *guessheight
 	guess_height = max_y
     guess_height = 200.0
-
-	gosub *plane01
 
     radius = guess_height * 2.0
     longi = 0.0
@@ -223,27 +219,3 @@
 	
 	return
 
-
-*plane01
-	filepath = "res/body_SD.png"
-	exist filepath
-	if strsize > 0 {
-		mtlid0 = -1
-		gptexmat mtlid0, filepath
-		gpfloor id, 200, 200, -1, mtlid0
-	}
-
-	_statzero
-	mtlid1 = -999
-	filepath = "res/head_SD.png"
-	exist filepath
-	if strsize > 0 {
-		gptexmat mtlid1, filepath // stat ‚Í•ÏX‚µ‚È‚¢
-		//dialog strf("%08X", mtlid1)
-		gpbox id, 200, -1, mtlid1
-		if id >= 0 {
-			setpos id, 200, 0, 0
-		}
-	}
-
-	return

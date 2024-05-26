@@ -1,8 +1,8 @@
 {
   "name": "hspgpb-vscode",
   "displayName": "hspgpb-vscode",
-  "description": "hsp gpb file lite looker for VS Code",
-  "version": "0.1.8",
+  "description": "Hsp3 gpb file lite looker for VS Code",
+  "version": "0.1.0",
   "publisher": "hta39393",
   "license": "MIT",
   "repository": {
@@ -21,40 +21,44 @@
     "commands": [
       {
         "command": "hspgpb-vscode.pawDraw.new",
-        "title": "HSPGPB: Create new gpb Document",
+        "title": "%hspgpb-vscode.pawDraw.new.title%",
         "category": "HSP"
       },
       {
         "command": "hspgpb-vscode.material",
-        "title": "HSPGPB: .material preview"
+        "title": "%hspgpb-vscode.material.title%"
+      },
+      {
+        "command": "hspgpb-vscode.viewgpblite",
+        "title": "%hspgpb-vscode.viewgpblite.title%"
       },
       {
         "command": "hspgpb-vscode.foo",
-        "title": "HSPGPB: foo command"
+        "title": "%hspgpb-vscode.foo.title%"
       },
       {
         "command": "hspgpb-vscode.bar",
-        "title": "HSPGPB: bar command"
+        "title": "%hspgpb-vscode.bar.title%"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "when": "resourceExtname == .gpb",
-          "command": "hspgpb-vscode.bar",
-          "group": "HSPGPB@1"
+          "command": "hspgpb-vscode.viewgpblite",
+          "group": "HSPGPB@2"
         },
         {
           "when": "resourceLangId === hspgpb-vscode.material",
           "command": "hspgpb-vscode.bar",
-          "group": "HSPGPB@2"
+          "group": "HSPGPB@1"
         }
       ],
       "editor/context": [
         {
           "when": "resourceLangId == hspgpb-vscode.material",
           "command": "hspgpb-vscode.foo",
-          "group": "HSPGPB@2"
+          "group": "HSPGPB@3"
         }
       ]
     },
