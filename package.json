@@ -65,7 +65,9 @@
     "languages": [
       {
         "id": "hspgpb-vscode.material",
-        "aliases": ["material for gpb"],
+        "aliases": [
+          "material for gpb"
+        ],
         "extensions": [
           ".material"
         ]
@@ -98,12 +100,10 @@
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
     "@vscode/test-electron": "^2.3.4",
+    "@vscode/vsce": "^2.26.1",
     "eslint": "^8.50.0",
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
     "typescript": "^5.2.2"
-  },
-  "dependencies": {
-    "@vscode/vsce": "^2.26.0"
   }
 }
