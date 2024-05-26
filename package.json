@@ -1,7 +1,7 @@
 {
   "name": "hspgpb-vscode",
   "displayName": "hspgpb-vscode",
-  "description": "Hsp3 gpb file lite looker for VS Code",
+  "description": "HSP gpb preview for VS Code",
   "version": "0.1.0",
   "publisher": "hta39393",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "url": "https://github.com/hta393939/hspgpb-vscode/"
   },
   "engines": {
-    "vscode": "^1.89.1"
+    "vscode": "*"
   },
   "categories": [
     "Other"
@@ -26,10 +26,6 @@
       {
         "command": "hspgpb-vscode.makepreviewcode",
         "title": "%hspgpb-vscode.makepreviewcode.title%"
-      },
-      {
-        "command": "hspgpb-vscode.bar",
-        "title": "%hspgpb-vscode.bar.title%"
       }
     ],
     "menus": {
@@ -43,11 +39,6 @@
           "when": "resourceExtname == .gpb",
           "command": "hspgpb-vscode.parsegpb",
           "group": "HSPGPB@2"
-        },
-        {
-          "when": "resourceExtname == .material",
-          "command": "hspgpb-vscode.bar",
-          "group": "HSPGPB@3"
         }
       ]
     },

@@ -1,11 +1,8 @@
 // エントリファイル
 
 import * as vscode from 'vscode';
-import { GpbLiteEditorProvider } from './gpbliteeditor';
 
-import { exec } from 'node:child_process';
 import { GpbLiteProvider } from './gpblite';
-
 import { MaterialLiteEditorProvider } from './materiallite';
 import { PreviewCode } from './previewcode';
 import { GpbPreviewProvider } from './gpbpreview';
@@ -14,7 +11,6 @@ import * as path from 'node:path';
 
 export function activate(context: vscode.ExtensionContext) {
 
-//  context.subscriptions.push(GpbLiteProvider.register(context));
   context.subscriptions.push(GpbPreviewProvider.register(context));
 
   { // commands hsp ファイル生成
@@ -30,6 +26,30 @@ export function activate(context: vscode.ExtensionContext) {
     }));
   }
 
+  {
+    const name = 'hspgpb-vscode.parsegpb';
+    context.subscriptions.push(vscode.commands.registerCommand(name, async (...commandArgs) => {
+      let parsed = path.parse('');
+      const [first] = commandArgs;
+      if (first instanceof vscode.Uri) {
+        parsed = path.parse(first.fsPath);
+      }
+
+      const panel = vscode.window.createWebviewPanel(
+        'hspgpb-vscode.gpbparse', // viewType
+        parsed.name,
+        vscode.ViewColumn.One,
+        {
+          enableScripts: true, // 重要
+        }
+      );
+
+      const provider = new GpbLiteProvider(context);
+      panel.webview.html = await provider.getHtmlForWebview(panel.webview, first);
+    }));
+  }
+
+  /*
   { // 初期実装
     const name = 'hspgpb-vscode.bar';
     context.subscriptions.push(vscode.commands.registerCommand(name, async (...commandArgs) => {
@@ -51,7 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
       const provider = new MaterialLiteEditorProvider(context);
       panel.webview.html = await provider.getHtmlForWebview(panel.webview, first);
     }));
-  }
+  } */
 
 }
 

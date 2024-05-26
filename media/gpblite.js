@@ -18,7 +18,7 @@
       this._initElements(parent);
     }
 
-    _initElements(/** @type {HTMLElement} */ parent) {
+    async _initElements(/** @type {HTMLElement} */ parent) {
 /**
  * @type {HTMLCanvasElement}
  */
@@ -29,6 +29,14 @@
 
       this.initGL(canvas);
       this.update();
+
+      {
+        const url = document.body.getAttribute('data-url');
+        const res = await fetch(url || '');
+        const ab = await res.arrayBuffer();
+        const u8buf = new Uint8Array(ab);
+        await this.reset(u8buf);
+      }
     }
 
     adjustCamera(cover, fovdeg) {

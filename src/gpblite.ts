@@ -146,9 +146,6 @@ class GpbLiteDocument extends Disposable implements vscode.CustomDocument {
 }
 
 /**
- * Provider for paw draw editors.
- * エディタの方は GpbLite "Editor" Provider
- *
  * This provider demonstrates:
  *
  * - How to implement a custom editor for binary files.
@@ -178,7 +175,7 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
       });
   }
 
-  private static readonly viewType = 'hspgpb-vscode.gpblite';
+  private static readonly viewType = 'hspgpb-vscode.gpbparse';
 
   /**
    * Tracks all known webviews
@@ -245,7 +242,7 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
     webviewPanel.webview.options = {
       enableScripts: true,
     };
-    webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
+    webviewPanel.webview.html = await this.getHtmlForWebview(webviewPanel.webview, vscode.Uri.parse(''));
 
     webviewPanel.webview.onDidReceiveMessage(e => this.onMessage(document, e));
 
@@ -293,20 +290,16 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
   /**
    * Get the static HTML used for in our editor's webviews.
    */
-  private getHtmlForWebview(webview: vscode.Webview): string {
+  public async getHtmlForWebview(webview: vscode.Webview, targetUri: vscode.Uri): Promise<string> {
     const base = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._context.extensionUri, 'media'
       )
     );
     const baseStr = base.toString() + '/';
-
-    // Local path to script and css for the webview
-//    const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
-//      this._context.extensionUri, 'media', 'gpblite.css'));
-
-    // Use a nonce to whitelist which scripts can be run
     const nonce = getNonce();
+
+    const targetWV = webview.asWebviewUri(targetUri);
 
     return /* html */`
       <!DOCTYPE html>
@@ -314,12 +307,12 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
       <head>
         <meta charset="UTF-8" />
         <base href="${baseStr}" />
-
-        <!--
-        Use a content security policy to only allow loading images from https or from our extension directory,
-        and only allow scripts that have a specific nonce.
-        -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} blob:; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+        <meta http-equiv="Content-Security-Policy" content="
+ default-src 'none';
+ connect-src ${webview.cspSource} blob:;
+ img-src ${webview.cspSource} blob:;
+  style-src ${webview.cspSource};
+   script-src 'nonce-${nonce}';">
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -327,11 +320,9 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
         <link href="vscode.css" rel="stylesheet" />
 
         <link href="gpblite.css" rel="stylesheet" />
-        <link href="style/color.css" rel="stylesheet" />
-
         <title></title>
       </head>
-      <body>
+      <body data-url="${targetWV.toString()}">
         <div class="tobottom">
           <div class="red text0">0</div>
           <div class="green text1">1</div>
@@ -339,6 +330,7 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
         <details open>
           <summary class="pt">情報</summary>
           <div class="toright">
+          ${targetWV.toString()}
             <div class="purple">purple</div>
             <div class="red">red</div>
             <div class="green">green</div>
@@ -346,7 +338,6 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
         </details>
         <div class="drawing-canvas"></div>
 
-        <!-- nonce を指定すること -->
         <script nonce="${nonce}" src="third_party/three.min.js"></script>
         <script nonce="${nonce}" src="third_party/OrbitControls.js"></script>
         <script nonce="${nonce}" src="lib/gpb.js"></script>
