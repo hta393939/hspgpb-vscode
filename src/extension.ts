@@ -3,7 +3,6 @@
 import * as vscode from 'vscode';
 
 import { GpbLiteProvider } from './gpblite';
-import { MaterialLiteEditorProvider } from './materiallite';
 import { PreviewCode } from './previewcode';
 import { GpbPreviewProvider } from './gpbpreview';
 
@@ -16,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
   { // commands hsp ファイル生成
     const name = 'hspgpb-vscode.makepreviewcode';
     context.subscriptions.push(vscode.commands.registerCommand(name, (...commandArgs) => {
-      vscode.window.showWarningMessage(`未実装 ${vscode.env.language} makepreviewcode foo ${name}`);
+      vscode.window.showWarningMessage(`HSPGPB: Not implemented`);
 
       const [first, second] = commandArgs;
       if (first instanceof vscode.Uri) {
@@ -48,30 +47,6 @@ export function activate(context: vscode.ExtensionContext) {
       panel.webview.html = await provider.getHtmlForWebview(panel.webview, first);
     }));
   }
-
-  /*
-  { // 初期実装
-    const name = 'hspgpb-vscode.bar';
-    context.subscriptions.push(vscode.commands.registerCommand(name, async (...commandArgs) => {
-      const first = commandArgs[0];
-      let parsed = path.parse('');
-      if (first instanceof vscode.Uri) {
-        parsed = path.parse(first.toString());
-      }
-
-      const panel = vscode.window.createWebviewPanel(
-        'hspgpb-vscode', // viewType
-        parsed.name,
-        vscode.ViewColumn.Two,
-        {
-          enableScripts: true, // 重要
-        }
-      );
-
-      const provider = new MaterialLiteEditorProvider(context);
-      panel.webview.html = await provider.getHtmlForWebview(panel.webview, first);
-    }));
-  } */
 
 }
 
