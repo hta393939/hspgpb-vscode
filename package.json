@@ -61,6 +61,23 @@
           }
         ]
       }
+    ],
+    "languages": [
+      {
+        "id": "hspgpb-material",
+        "extensions": [
+          ".material"
+        ],
+        "aliases": ["material for gpb"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "hspgpb-material",
+        "scopeName": "source.hspgpb-material",
+        "path": "./syntaxes/hspgpb-material.tmLanguage.json"
+      }
     ]
   },
   "scripts": {

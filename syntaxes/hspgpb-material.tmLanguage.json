@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "hspgpb-material",
+  "scopeName": "source.hspgpb-material",
+  "patterns": [
+      {
+        "name": "keyword.control.hspgpb-material",
+        "match": "\\b(material|sampler|renderState|LINEAR)\\b"
+      },
+      {
+        "name": "constant.numeric.decimal.hspgbp-material",
+        "match": "\\b[0-9]+\\.[0-9]*(F|f)?\\b"
+      },
+      {
+        "name": "constant.numeric.decimal.hspgbp-material",
+        "match": "(\\.([0-9]+)(F|f)?\\b"
+      },
+      {
+        "name": "constant.numeric.decimal.hspgbp-material",
+        "match": "\\b([0-9]+(F|f)?)\\b"
+      },
+      {
+        "name": "constant.language.hspgpb-material",
+        "match": "\\b(false|true)\\b"
+      },
+      {
+        "name": "storage.type.fx.technique.hspgpb-material",
+        "match": "\\b(technique|pass)\\b"
+      },
+      {
+        "name": "support.constant.property-value.fx.textureaddressmode.hspgpb-material",
+        "match": "\\b(WRAP|MIRROR|CLAMP)\\b"
+      }
+  ]
+}
