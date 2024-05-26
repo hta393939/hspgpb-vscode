@@ -1,7 +1,5 @@
 {
-  "hspgpb-vscode.pawDraw.new.title": "HSPGPB: Create paw",
-  "hspgpb-vscode.material.title": "HSPGPB: Parse .gpb material",
-  "hspgpb-vscode.foo.title": "HSPGPB: Create gpb preview code",
+  "hspgpb-vscode.makepreviewcode.title": "HSPGPB: Create gpb preview code",
   "hspgpb-vscode.bar.title": "HSPGPB: Preview gpb file",
-  "hspgpb-vscode.viewgpblite.title": "HSPGPB: hspgpb-vscode.viewgpb"
+  "hspgpb-vscode.parsegpb.title": "HSPGPB: Parse gpb file"
 }

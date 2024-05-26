@@ -13,36 +13,14 @@ import { GpbPreviewProvider } from './gpbpreview';
 import * as path from 'node:path';
 
 export function activate(context: vscode.ExtensionContext) {
-  //context.subscriptions.push(GpbLiteEditorProvider.register(context));
-  context.subscriptions.push(GpbLiteProvider.register(context));
+
+//  context.subscriptions.push(GpbLiteProvider.register(context));
   context.subscriptions.push(GpbPreviewProvider.register(context));
 
-  { // commands に記載したコマンドの実装
-    const name = 'hspgpb-vscode.material';
-    context.subscriptions.push(vscode.commands.registerCommand(name, () => {
-      const editor = vscode.window.activeTextEditor;
-      const doc = editor?.document;
-      let text = doc?.getText();
-      vscode.window.showInformationMessage(text ?? 'material undefined');
-
-      const panel = vscode.window.createWebviewPanel(
-        'hspgpb-vscode', // viewType
-        'titlesample1',
-        vscode.ViewColumn.Two,
-        {}
-      );
-      panel.webview.html = `<html><body>sample1</body></html>`;
-
-      exec('mspaint.exe', (error, stdout, stderr) => {
-        // 終了後
-      });
-    }));
-  }
-
   { // commands hsp ファイル生成
-    const name = 'hspgpb-vscode.foo';
+    const name = 'hspgpb-vscode.makepreviewcode';
     context.subscriptions.push(vscode.commands.registerCommand(name, (...commandArgs) => {
-      vscode.window.showInformationMessage(`foo ${name}`);
+      vscode.window.showWarningMessage(`未実装 ${vscode.env.language} makepreviewcode foo ${name}`);
 
       const [first, second] = commandArgs;
       if (first instanceof vscode.Uri) {
@@ -52,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
     }));
   }
 
-  {
+  { // 初期実装
     const name = 'hspgpb-vscode.bar';
     context.subscriptions.push(vscode.commands.registerCommand(name, async (...commandArgs) => {
       const first = commandArgs[0];

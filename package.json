@@ -10,7 +10,7 @@
     "url": "https://github.com/hta393939/hspgpb-vscode/"
   },
   "engines": {
-    "vscode": "^1.83.0"
+    "vscode": "^1.89.1"
   },
   "categories": [
     "Other"
@@ -20,21 +20,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "hspgpb-vscode.pawDraw.new",
-        "title": "%hspgpb-vscode.pawDraw.new.title%",
-        "category": "HSP"
+        "command": "hspgpb-vscode.parsegpb",
+        "title": "%hspgpb-vscode.parsegpb.title%"
       },
       {
-        "command": "hspgpb-vscode.material",
-        "title": "%hspgpb-vscode.material.title%"
-      },
-      {
-        "command": "hspgpb-vscode.viewgpblite",
-        "title": "%hspgpb-vscode.viewgpblite.title%"
-      },
-      {
-        "command": "hspgpb-vscode.foo",
-        "title": "%hspgpb-vscode.foo.title%"
+        "command": "hspgpb-vscode.makepreviewcode",
+        "title": "%hspgpb-vscode.makepreviewcode.title%"
       },
       {
         "command": "hspgpb-vscode.bar",
@@ -45,12 +36,12 @@
       "explorer/context": [
         {
           "when": "resourceExtname == .gpb",
-          "command": "hspgpb-vscode.viewgpblite",
+          "command": "hspgpb-vscode.makepreviewcode",
           "group": "HSPGPB@1"
         },
         {
           "when": "resourceExtname == .gpb",
-          "command": "hspgpb-vscode.bar",
+          "command": "hspgpb-vscode.parsegpb",
           "group": "HSPGPB@2"
         },
         {
