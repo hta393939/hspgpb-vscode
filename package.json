@@ -59,8 +59,7 @@
         "extensions": [
           ".material"
         ],
-        "aliases": ["material for gpb"],
-        "configuration": "./language-configuration.json"
+        "aliases": ["material for gpb"]
       }
     ],
     "grammars": [
