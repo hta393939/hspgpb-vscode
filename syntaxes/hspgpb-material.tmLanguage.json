@@ -3,29 +3,185 @@
   "name": "hspgpb-material",
   "scopeName": "source.hspgpb-material",
   "patterns": [
-    {
+    {"include": "#material"}
+  ],
+  "repository": {
+    "material": {
+      "name": "material.hspgpb-material",
+      "begin": "\\b(material)\\b\\s+(\\S+)(\\s*:\\s*(\\S+))?",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.material.hspgpb-material"},
+        "2": {"name": "entity.name.type.id.hspgpb-material"},
+        "4": {"name": "entity.name.type.parent.hspgpb-material"}
+      },
+      "patterns": [
+        {"include": "#materialscope"}
+      ],
+      "end": "(?<=})"
+    },
+    "materialscope": {
+      "name": "materialscope.hspgpb-material",
+      "begin": "\\{",
+      "patterns": [
+        {"include": "#setvalue"},
+        {"include": "#renderstate"},
+        {"include": "#sampler"},
+        {"include": "#technique"}
+      ],
+      "end": "\\}"
+    },
+    "renderstate": {
+      "name": "renderstate.hspgpb-material",
+      "begin": "\\b(renderState)\\b",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.renderstate.hspgpb-material"}
+      },
+      "patterns": [
+        {"include": "#renderstatescope"}
+      ],
+      "end": "(?<=})"
+    },
+    "renderstatescope": {
+      "name": "renderstatescope.hspgpb-material",
+      "begin": "\\{",
+      "patterns": [
+        {"include": "#setvalue"}
+      ],
+      "end": "\\}"
+    },
+    "sampler": {
+      "name": "sampler.hspgpb-material",
+      "begin": "\\b(sampler)\\b\\s+(\\S+)",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.sampler.hspgpb-material"},
+        "2": {"name": "entity.name.type.sampler.hspgpb-material"}
+      },
+      "patterns": [
+        {"include": "#samplerscope"}
+      ],
+      "end": "(?<=})"
+    },
+    "samplerscope": {
+      "name": "samplerscope.hspgpb-material",
+      "begin": "\\{",
+      "patterns": [
+        {"include": "#setvalue"}
+      ],
+      "end": "\\}"
+    },
+    "technique": {
+      "name": "technique.hspgpb-material",
+      "begin": "\\b(technique)\\b",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.technique.hspgpb-material"}
+      },
+      "patterns": [
+        {"include": "#techniquescope"}
+      ],
+      "end": "(?<=})"
+    },
+    "techniquescope": {
+      "name": "techniquescope.hspgpb-material",
+      "begin": "\\{",
+      "patterns": [
+        {"include": "#pass"}
+      ],
+      "end": "\\}"
+    },
+    "pass": {
+      "name": "pass.hspgpb-material",
+      "begin": "\\b(pass)\\b",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.pass.hspgpb-material"}
+      },
+      "patterns": [
+        {"include": "#setvalue"}
+      ],
+      "end": "(?<=})"
+    },
+    "passscope": {
+      "name": "passscope.hspgpb-material",
+      "begin": "\\{",
+      "patterns": [
+        {"include": "#setvalue"}
+      ],
+      "end": "\\}"
+    },
+    "setvalue": {
+      "name": "setvalue.hspgpb-material",
+      "patterns": [
+        {"include": "#key"},
+        {"include": "#equal"},
+        {"include": "#value"}
+      ]
+    },
+    "key": {
+      "name": "variable.other.key.hspgpb-material",
+      "match": "\\S+(?=\\s*=\\s*)"
+    },
+    "equal": {
+      "name": "keyword.operator.hspgpb-material",
+      "match": "="
+    },
+    "value": {
+      "name": "value.hspgpb-material",
+      "patterns": [
+        {"include": "#int"},
+        {"include": "#number"},
+        {"include": "#truefalse"},
+        {"include": "#filter"},
+        {"include": "#tex"},
+        {"include": "#autobindenum"},
+        {"include": "#blend"},
+        {"include": "#define11"},
+        {"include": "#define12"},
+        {"include": "#define21"},
+        {"include": "#define"}
+      ]
+    },
+    "int": {
+      "name": "constant.numeric.decimal.hspgpb-material",
+      "match": "\\b[0-9]+\\b"
+    },
+    "number": {
       "name": "constant.numeric.decimal.hspgpb-material",
       "match": "\\b[0-9]+\\.[0-9]*(F|f)?\\b"
     },
-      {
-        "name": "keyword.reserved.hspgpb-material",
-        "match": "\\b(material|sampler|renderState)\\b"
-      },
-      {
-        "name": "keyword.reserved.hspgpb-material",
-        "match": "\\b(LINEAR|LINEAR_MIPMAP_LINEAR)\\b"
-      },
-      {
-        "name": "constant.language.hspgpb-material",
-        "match": "\\b(false|true)\\b"
-      },
-      {
-        "name": "storage.type.fx.technique.hspgpb-material",
-        "match": "\\b(technique|pass)\\b"
-      },
-      {
-        "name": "support.constant.property-value.fx.textureaddressmode.hspgpb-material",
-        "match": "\\b(WRAP|MIRROR|CLAMP|REPEAT)\\b"
-      }
-  ]
+    "truefalse": {
+      "name": "constant.language.hspgpb-material",
+      "match": "\\b(false|true)\\b"
+    },
+    "tex": {
+      "name": "support.constant.property-value.fx.textureaddressmode.hspgpb-material",
+      "match": "\\b(WRAP|MIRROR|CLAMP|REPEAT)\\b"
+    },
+    "autobindenum": {
+      "name": "support.constant.property-value.autobindenum.hspgpb-material",
+      "match": "\\b(WORLD_MATRIX|VIEW_MATRIX|PROJECTION_MATRIX|WORLD_VIEW_MATRIX|VIEW_PROJECTION_MATRIX|WORLD_VIEW_PROJECTION_MATRIX|INVERSE_TRANSPOSE_WORLD_MATRIX|INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX|CAMERA_WORLD_POSITION|CAMERA_VIEW_POSITION|MATRIX_PALETTE)\\b"
+    },
+    "filter": {
+      "name": "support.constant.property-value.fx.filter.hspgpb-material",
+      "match": "\\b(NEAREST|LINEAR|NEAREST_MIPMAP_NEAREST|LINEAR_MIPMAP_NEAREST|NEAREST_MIPMAP_LINEAR|LINEAR_MIPMAP_LINEAR)\\b"
+    },
+    "blend": {
+      "name": "support.constant.property-value.blend.hspgpb-material",
+      "match": "\\b(ZERO|ONE|SRC_ALPHA|ONE_MINUS_SRC_ALPHA|DST_ALPHA)\\b"
+    },
+    "define11": {
+      "name": "support.constant.property-value.define11.hspgpb-material",
+      "match": "(?<=[\\s;=])(DIRECTIONAL_LIGHT_COUNT|POINT_LIGHT_COUNT|SPOT_LIGHT_COUNT)(?=[\\s;])"
+    },
+    "define12": {
+      "name": "support.constant.property-value.define12.hspgpb-material",
+      "match": "(?<=[\\s;=])(VERTEX_COLOR|LIGHTMAP|LIGHTING|BUMPED|SPECULAR|TEXTURE_REPEAT|TEXTURE_OFFSET|CLIP_PLANE)(?=[\\s;])"
+    },
+    "define21": {
+      "name": "support.constant.property-value.define13.hspgpb-material",
+      "match": "(?<=[\\s;=])(MODULATE_COLOR|MODULATE_ALPHA|MIRRORTEX|TEXTURE_NODISCARD_ALPHA)(?=[\\s;])"
+    },
+    "define": {
+      "name": "support.constant.property-value.define.hspgpb-material",
+      "match": "(?<=[\\s;=])(SKINNING|SKINNING_JOINT_COUNT)(?=[\\s;])"
+    }
+  }
 }
