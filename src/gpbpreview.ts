@@ -3,11 +3,13 @@
  */
 
 import * as vscode from 'vscode';
-import { Disposable, disposeAll } from './dispose';
-import { getNonce } from './util';
+import {Disposable, disposeAll} from './dispose';
+import {getNonce} from './util';
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
+import {PreGpb} from './pregpb';
 
 interface GpbPreviewEdit {
     readonly color: string;
@@ -345,18 +347,11 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
      * ページテキストを返す
 	 */
 	public async getHtmlForWebview(webview: vscode.Webview, targetUri: vscode.Uri): Promise<string> {
-
-// .js を取り込みできるのだろうか???
 		const binary = await vscode.workspace.fs.readFile(targetUri);
 
-		const model = {_reftable: {references: [
-			{type: 128 * 0}
-		]}};
-		//const model = parseGPB(binary.buffer);
-
-		const isFont = model?._reftable?.references.some(v =>
-			v.type === 128
-		);
+		const parser = new PreGpb();
+		const gr = parser.parseGPB(binary.buffer);
+		const isFont = gr.userData.hasFont;
 
 		const base = webview.asWebviewUri(
 			vscode.Uri.joinPath(this._context.extensionUri, 'media')
@@ -381,7 +376,13 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 					return lines.join('\n');
 				}).join('\n');
 
-				fsPosition += `\nvar _name = '${result.name}';\n`;
+				const lines = [
+					`${result.name}`,
+					`${[...gr.userData.min, ...gr.userData.max, ...gr.userData.center].join(',')}`,
+					``,
+				];
+
+				fsPosition += `\nvar _name = '${lines.join('\\n')}';`;
 				fsPosition += `var _buf = new TextEncoder().encode(_name);\n`;
 				fsPosition += `Module['FS_createPreloadedFile']('/', '_name.txt', _buf, true, true);\n`;
 
