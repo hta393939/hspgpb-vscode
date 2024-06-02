@@ -346,46 +346,61 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 	 */
 	public async getHtmlForWebview(webview: vscode.Webview, targetUri: vscode.Uri): Promise<string> {
 
+// .js を取り込みできるのだろうか???
+		const binary = await vscode.workspace.fs.readFile(targetUri);
+		const model = {_reftable: {references: [
+			{type: 128}
+		]}};
+		//const model = parseGPB(binary.buffer);
+		const isFont = model?._reftable?.references.some(v =>
+			v.type === 128
+		);
+
 		const base = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._context.extensionUri, 'media'
-			)
+			vscode.Uri.joinPath(this._context.extensionUri, 'media')
 		);
 		const baseStr = base.toString() + '/';
 
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
 
-		let ret = `<html><body>start! 5</body></html>`;
-		let str = 'mate<br />';
+		let ret = `<html><body>n/a</body></html>`;
+		let str = 'material<br />';
 
 		let fsPosition = '/* emscripten empty replace */';
-		try {
-			const result = await this.parseMaterial(targetUri);
-			fsPosition = result.emsFiles.map(files => {
-				const lines: string[] = [
-					`Module['FS_createPath']('/', '${files.emsDir}', true, true);`,
-					`Module['FS_createPreloadedFile']('/', '${files.emsFilename}', '${webview.asWebviewUri(files.uri).toString()}', true, true);`,
-				];
-				return lines.join('\n');
-			}).join('\n');
+		if (!isFont) {
+			try {
+				const result = await this.parseMaterial(targetUri);
+				fsPosition = result.emsFiles.map(files => {
+					const lines: string[] = [
+						`Module['FS_createPath']('/', '${files.emsDir}', true, true);`,
+						`Module['FS_createPreloadedFile']('/', '${files.emsFilename}', '${webview.asWebviewUri(files.uri).toString()}', true, true);`,
+					];
+					return lines.join('\n');
+				}).join('\n');
 
-			fsPosition += `\nvar _name = '${result.name}';\n`;
-			fsPosition += `var _buf = new TextEncoder().encode(_name);\n`;
-			fsPosition += `Module['FS_createPreloadedFile']('/', '_name.txt', _buf, true, true);\n`;
+				fsPosition += `\nvar _name = '${result.name}';\n`;
+				fsPosition += `var _buf = new TextEncoder().encode(_name);\n`;
+				fsPosition += `Module['FS_createPreloadedFile']('/', '_name.txt', _buf, true, true);\n`;
 
-			//fsPosition += `Module['FS_createPreloadedFile']('/', 'look.ax', './look.ax', true, true)`;
+				//fsPosition += `Module['FS_createPreloadedFile']('/', 'look.ax', './look.ax', true, true)`;
 
-		} catch (ec) {
-			vscode.window.showWarningMessage(`Error occured`);
-			return `Error occured`;
+			} catch (ec) {
+				vscode.window.showWarningMessage(`Error occured`);
+				return `Error occured`;
+			}
+		} else {
+			const viewUri = webview.asWebviewUri(targetUri);
+			fsPosition = `var _name = "${viewUri.toString()}";\n`;
 		}
 
 		try {
 			const source = webview.cspSource;
 
 			const templateUri = vscode.Uri.joinPath(
-				this._context.extensionUri, 'media', 'look.html'
+				this._context.extensionUri,
+				'media',
+				!isFont ? 'look.html' : 'font.template.html'
 			);
 			const u8 = await vscode.workspace.fs.readFile(templateUri);
 			ret = new TextDecoder().decode(u8);
@@ -409,47 +424,6 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 
 		//vscode.window.showInformationMessage(str);
 		return ret;
-
-		return /* html */`
-			<!DOCTYPE html>
-			<html>
-			<head>
-				<meta charset="UTF-8" />
-				<base href="${baseStr}" />
-
-				<!--
-				Use a content security policy to only allow loading images from https or from our extension directory,
-				and only allow scripts that have a specific nonce.
-				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} blob:; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-				<link href="reset.css" rel="stylesheet" />
-				<link href="vscode.css" rel="stylesheet" />
-				<link href="pawDraw.css" rel="stylesheet" />
-
-				<title>HSP Gpb Lite</title>
-			</head>
-			<body>
-            bar で表示したい1
-				<div class="corge">gpb ファイル</div>
-				<div class="drawing-canvas"></div>
-
-				<div>
-					<div>未実装: 材質</div>
-					<div id="materialelement"></div>
-				</div>
-
-				<div class="drawing-controls">
-					<button data-color="red" class="red" title="Red"></button>
-					<button data-color="green" class="green" title="Green"></button>
-				</div>
-
-				<script nonce="${nonce}" src="hsp3dishw-gp.js"></script>
-				<script nonce="${nonce}" src="pawDraw.js"></script>
-			</body>
-			</html>`;
 	}
 
 /**
