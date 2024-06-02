@@ -170,6 +170,10 @@ export class PreGpb {
       }
     }
 
+    if (gr.userData.hasFont) {
+      return gr;
+    }
+
     { // メッシュ
       const meshNum = this.r32s(p, 1)[0];
       log.log('meshNum', meshNum);
