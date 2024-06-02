@@ -34,13 +34,13 @@ class Font {
                 const doffset = soffset * 4;
                 let lv = p.getUint8(offset + soffset);
 
-                data.data[doffset] = lv;
+                data.data[doffset  ] = lv; // r
                 data.data[doffset+1] = lv;
                 data.data[doffset+2] = lv;
-                data.data[doffset+3] = 255;
+                data.data[doffset+3] = 255; // a
             }
         }
-        c.putImageData(data, w, h);
+        c.putImageData(data, 0, 0);
     }
 
 /**
@@ -99,6 +99,11 @@ class Font {
         }
 
         if (fontOffset < 0) {
+            const el = document.getElementById('info');
+            el.textContent = 'Not font';
+
+            const canvas = document.getElementById('main');
+            canvas.remove();
             return;
         }
 
@@ -124,7 +129,6 @@ class Font {
         this.i32(p);
 
         const glyphnum = this.i32(p);
-        console.log('glyphnum', glyphnum);
 
         for (let i = 0; i < glyphnum; ++i) {
             this.i32(p);
@@ -142,7 +146,7 @@ class Font {
         const bytenum = this.i32(p);
         console.log('bitmap', w, h, bytenum);
 
-        str = `${this.name}, ${glyphnum}`;
+        str = `${this.name}, ${glyphnum} glyph`;
         el.textContent = str;
 
         const canvas = document.getElementById('main');

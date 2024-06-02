@@ -1,4 +1,9 @@
-canvas {
+
+#info {
+    font-weight: bold;
+}
+
+#main {
     border: solid 2px green;
 }
 
