@@ -30,8 +30,12 @@
 	key = 0
 	max_y = -999
 	sdim note, 4096
-    errmsg = ""
-	name = ""
+    sdim errmsg, 4096
+	sdim name, 4096
+	sdim text, 4096
+	sdim one, 4096
+	dim ps, 9
+	offset = 0
 
 /*PARAMETERPOSITION*/
 
@@ -42,6 +46,13 @@
 		noteload "_name.txt", 4000
 		noteget name, 0
 
+		noteget text, 1
+		repeat 9
+			getstr one, text, offset, ','
+			offset += strsize
+			ps.cnt = double(one)
+		loop
+
 	    gpload id, name
     	if (id < 0) {
         	errmsg = "gpload error, " + name
@@ -51,8 +62,7 @@
 	}
 
 	gosub *guessheight
-	guess_height = max_y
-    guess_height = 200.0
+    guess_height = ps.4 - ps.1
 
     radius = guess_height * 2.0
     longi = 0.0
@@ -66,7 +76,7 @@
 	keeplati = lati
 
 *main
-	curdown = 0	// ���񉺂����ǂ���
+	curdown = 0	//
 
 	stick key, 0x3ff
 	down = key & 256
@@ -78,21 +88,21 @@
 
 	if predown {
 		if curdown {
-			// �A������
+			// continue pan
 			longi = - double(curx - keepx) + keeplongi
 			lati = double(cury - keepy) + keeplati
 		} else {
-			// �グ������
+			// release
 		}
 	} else {
 		if curdown {
-			// �V����������
+			// start pan
 			keepx = curx
 			keepy = cury
 			keeplongi = longi
 			keeplati = lati
 		} else {
-			// �������Ă��Ȃ�
+			// no action
 		}
 	}
 	if lati >= 90.0 {
@@ -104,7 +114,7 @@
 	predown = curdown
 	
 
-// ���a�̕ϓ�
+// wheel
     mw = mousew
 	radius += double(mw) * 0.2
 	
@@ -116,7 +126,7 @@
 	//stick key, 0x0f | 0xffffff
 
 
-	lookat.0 = 0.0, guess_height * 0.5, 0.0
+	lookat.0 = ps.6, ps.7, ps.8
 
 	vang = lati * M_PI / 180.0
 	hang = longi * M_PI / 180.0
@@ -147,9 +157,10 @@
         color 255, 0, 0
         print errmsg
     } else {
-	    print "OK" + radius
+	    print "OK" + radius + ", " + guess_height
 	    print note
 	    print filepath
+	    print strf("%.3f", ps.6) + strf(", %.3f", ps.7) + strf(", %.3f", ps.8)
 	    print key
 	}
 
