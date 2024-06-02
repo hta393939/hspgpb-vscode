@@ -348,10 +348,12 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 
 // .js を取り込みできるのだろうか???
 		const binary = await vscode.workspace.fs.readFile(targetUri);
+
 		const model = {_reftable: {references: [
-			{type: 128}
+			{type: 128 * 0}
 		]}};
 		//const model = parseGPB(binary.buffer);
+
 		const isFont = model?._reftable?.references.some(v =>
 			v.type === 128
 		);
