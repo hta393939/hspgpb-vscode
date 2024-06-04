@@ -19,13 +19,17 @@
 	
 #global
 
-#define DELTA (0.002)
+#define DELTA (0.001)
 #const KEY_LBUT 0x100
 #const KEY_RBUT 0x200
-#const KEY_Z 0x800
+#const KEY_W 0x8000
+#const KEY_S 0x20000
+
+#define EE (2.718281828)
 
 	gpreset
 
+	fov = 45.0
 	id = -1
 	key = 0
 	max_y = -999
@@ -34,7 +38,7 @@
 	sdim name, 4096
 	sdim text, 4096
 	sdim one, 4096
-	dim ps, 9
+	ddim ps, 6
 	offset = 0
 
 /*PARAMETERPOSITION*/
@@ -47,7 +51,7 @@
 		noteget name, 0
 
 		noteget text, 1
-		repeat 9
+		repeat 6
 			getstr one, text, offset, ','
 			offset += strsize
 			ps.cnt = double(one)
@@ -61,13 +65,30 @@
 	    errmsg = "Internal error"
 	}
 
-	gosub *guessheight
-    guess_height = ps.4 - ps.1
+	//gosub *guessheight
 
-    radius = guess_height * 2.0
+	w2 = (ps.3 - ps.0) * 0.5
+    h2 = (ps.4 - ps.1) * 0.5
+    d2 = (ps.5 - ps.2) * 0.5
+
+	maxr = w2
+	if w2 < h2 {
+		maxr = h2
+	}
+
+    radius = maxr * 2.0 / tan(fov * 0.5 * M_PI / 180.0) + d2
     longi = 0.0
     lati = 0.0
     premousew = mousew
+
+	//exp2 = logf(radius) / EE
+	step = radius / 128.0
+
+	far = radius * 4.0
+	near = radius / 256.0
+	gpnull cameraid
+	gpcamera cameraid, fov, 1.0, near, far
+	gpusecamera cameraid
 
 	keepx = 0
 	keepy = 0
@@ -78,7 +99,7 @@
 *main
 	curdown = 0	//
 
-	stick key, 0x3ff
+	stick key, 0x3ff | KEY_W | KEY_S
 	down = key & 256
 	if down {
 		curdown = 1
@@ -117,16 +138,21 @@
 // wheel
     mw = mousew
 	radius += double(mw) * 0.2
-	
+    premousew = mw
+
+// fw or bw
+	if key & KEY_W {
+		radius -= step
+	}
+	if key & KEY_S {
+		radius += step
+	}
+
 	if radius < DELTA {
 		radius = DELTA
 	}
-    premousew = mw
 
-	//stick key, 0x0f | 0xffffff
-
-
-	lookat.0 = ps.6, ps.7, ps.8
+	lookat.0 = (ps.0 + ps.3) * 0.5, (ps.1 + ps.4) * 0.5, (ps.2 + ps.5) * 0.5
 
 	vang = lati * M_PI / 180.0
 	hang = longi * M_PI / 180.0
@@ -145,8 +171,8 @@
     color 0, 0, 0
     boxf
 
-    setpos GPOBJ_CAMERA, x, y, z
-    gplookat GPOBJ_CAMERA, lookat.0, lookat.1, lookat.2
+    setpos cameraid, x, y, z
+    gplookat cameraid, lookat.0, lookat.1, lookat.2
 
     gpdraw
 
@@ -157,15 +183,17 @@
         color 255, 0, 0
         print errmsg
     } else {
-	    print "OK" + radius + ", " + guess_height
+	    print "OK" + radius + ", "
 	    print note
 	    print filepath
-	    print strf("%.3f", ps.6) + strf(", %.3f", ps.7) + strf(", %.3f", ps.8)
+	    print strf("%.3f", ps.3) + strf(", %.3f", ps.4) + strf(", %.3f", ps.5)
 	    print key
+	    print strf("%.3f", x) + strf(", %.3f", y) + strf(", %.3f", z)
+	    print strf("%.3f", w2) + strf(", %.3f", h2) + strf(", %.3f", d2)
 	}
 
     redraw 1
-    await 1000/60
+    await 1000/30
     goto *main
 
 

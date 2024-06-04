@@ -378,11 +378,11 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 
 				const lines = [
 					`${result.name}`,
-					`${[...gr.userData.min, ...gr.userData.max, ...gr.userData.center].join(',')}`,
+					`${[...gr.userData.min, ...gr.userData.max].join(',')}`,
 					``,
 				];
 
-				fsPosition += `\nvar _name = '${lines.join('\\n')}';`;
+				fsPosition += `\nvar _name = '${lines.join('\\n')}';\n`;
 				fsPosition += `var _buf = new TextEncoder().encode(_name);\n`;
 				fsPosition += `Module['FS_createPreloadedFile']('/', '_name.txt', _buf, true, true);\n`;
 
