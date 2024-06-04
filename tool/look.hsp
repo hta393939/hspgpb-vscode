@@ -76,7 +76,7 @@
 		maxr = h2
 	}
 
-    radius = maxr * 2.0 / tan(fov * 0.5 * M_PI / 180.0) + d2
+    radius = maxr * 1.125 / tan(fov * 0.5 * M_PI / 180.0) + d2
     longi = 0.0
     lati = 0.0
     premousew = mousew
@@ -100,7 +100,7 @@
 	curdown = 0	//
 
 	stick key, 0x3ff | KEY_W | KEY_S
-	down = key & 256
+	down = key & KEY_LBUT
 	if down {
 		curdown = 1
 		curx = mousex
@@ -109,19 +109,28 @@
 
 	if predown {
 		if curdown {
-			// continue pan
-			longi = - double(curx - keepx) + keeplongi
-			lati = double(cury - keepy) + keeplati
+			if mode == "pan" {
+				// continue pan
+				longi = - double(curx - keepx) + keeplongi
+				lati = double(cury - keepy) + keeplati
+			} else {
+				radius = double(cury - keepy) * step / 8.0 + keepradius
+			}
 		} else {
 			// release
 		}
 	} else {
-		if curdown {
-			// start pan
+		if curdown { // start action
+			if curx < 32 { // ¶’[‚ÍƒY[ƒ€‚Æ‚·‚é
+				mode = "zoom"
+			} else {
+				mode = "pan"
+			}
 			keepx = curx
 			keepy = cury
 			keeplongi = longi
 			keeplati = lati
+			keepradius = radius
 		} else {
 			// no action
 		}
@@ -183,9 +192,8 @@
         color 255, 0, 0
         print errmsg
     } else {
-	    print "OK" + radius + ", "
+	    print "OK, " + radius + ", "
 	    print note
-	    print filepath
 	    print strf("%.3f", ps.3) + strf(", %.3f", ps.4) + strf(", %.3f", ps.5)
 	    print key
 	    print strf("%.3f", x) + strf(", %.3f", y) + strf(", %.3f", z)
@@ -195,67 +203,4 @@
     redraw 1
     await 1000/30
     goto *main
-
-
-*guessheight
-	notesel note
-	max_y = 0.0
-
-	nodename = ""
-	gpnodeinfo nodename, id, GPNODEINFO_NAME
-	noteadd strf("n, %s", nodename)
-
-	skinrootname = ""
-	gpnodeinfo skinrootname, id, GPNODEINFO_SKINROOT, ""
-	noteadd strf("sr, %s", skinrootname)
-
-	nodename = skinrootname
-
-	childname = ""
-	gpnodeinfo childname, id, GPNODEINFO_CHILD, nodename
-	if stat < 0 {
-	}
-	noteadd strf("c, %s", childname)
-
-	eldername = childname
-*guessheight5
-	sibname = ""
-	repeat 10
-		gpnodeinfo sibname, id, GPNODEINFO_SIBLING, eldername
-		if stat >= 0 & sibname != "" {
-			noteadd strf("s, %s", sibname)
-			eldername = sibname
-			//goto *guessheight5
-		} else {
-			break
-		}
-	loop
-
-	parentname = childname
-	repeat 10
-		gpnodeinfo childname, id, GPNODEINFO_CHILD, parentname
-		if stat < 0 | childname != "" {
-			break
-		}
-		noteadd strf("child, %s", childname)
-		parentname = childname
-	loop
-
-	num = noteinfo(0)
-	repeat num
-		noteget nodename, cnt
-
-//	nodename = "asi_L_"
-		infonode = ""
-		gpnodeinfo infonode, id, GPNODEINFO_NODE, nodename
-		if infonode > 0 {
-			getpos infonode, x, y, z
-			if y >= max_y {
-				max_y = y
-			}
-		}
-	loop
-	title strf("max_y, %f", max_y)
-	
-	return
 
