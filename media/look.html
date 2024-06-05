@@ -3,23 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-
-    <base href="/*BASEHREFPOSITION*/" />
-    <meta http-equiv="Content-Security-Policy" content="
-    default-src 'none';
-    connect-src /*CSPPOSITION*/ blob: data:;
-     img-src /*CSPPOSITION*/ blob: data:;
-     media-src /*CSPPOSITION*/ blob: data:;
-      style-src /*CSPPOSITION*/ 'nonce-/*NONCEPOSITION*/';
-       script-src 'wasm-unsafe-eval' /*CSPPOSITION*/ 'nonce-/*NONCEPOSITION*/';
-       ">
-
-
     <title>look - HSP3Dish</title>
     <style>
       body {
-        font-family: arial; /* template */
+        font-family: arial;
         margin: 0;
         padding: none;
       }
@@ -216,7 +203,7 @@ Module.expectedDataFileDownloads++;
     }
     var PACKAGE_NAME = 'look.data';
     var REMOTE_PACKAGE_NAME = (Module['filePackagePrefixURL'] || '') + 'look.data';
-    var REMOTE_PACKAGE_SIZE = 58301;
+    var REMOTE_PACKAGE_SIZE = 58165;
     var PACKAGE_UUID = '51f84d03-0c74-4552-ac13-924e79e76977';
   
     function fetchRemotePackage(packageName, packageSize, callback, errback) {
@@ -284,8 +271,6 @@ Module['FS_createPath']('/', 'res', true, true);
 Module['FS_createPath']('/res', 'shaders', true, true);
 
 
-/*FSPOSITION*/
-
     function DataRequest(start, end, crunched, audio) {
       this.start = start;
       this.end = end;
@@ -321,41 +306,41 @@ Module['FS_createPath']('/res', 'shaders', true, true);
       },
     };
 
-      new DataRequest(0, 2916, 0, 0).open('GET', 'look.ax');
-      new DataRequest(2916, 5982, 0, 0).open('GET', 'res/shaders/colored.frag');
-      new DataRequest(5982, 9142, 0, 0).open('GET', 'res/shaders/colored.vert');
-      new DataRequest(9142, 10028, 0, 0).open('GET', 'res/shaders/font.frag');
-      new DataRequest(10028, 10537, 0, 0).open('GET', 'res/shaders/font.vert');
-      new DataRequest(10537, 13828, 0, 0).open('GET', 'res/shaders/lighting.frag');
-      new DataRequest(13828, 16124, 0, 0).open('GET', 'res/shaders/lighting.vert');
-      new DataRequest(16124, 17533, 0, 0).open('GET', 'res/shaders/p_blur.frag');
-      new DataRequest(17533, 18386, 0, 0).open('GET', 'res/shaders/p_blur2.frag');
-      new DataRequest(18386, 19312, 0, 0).open('GET', 'res/shaders/p_blur2.vert');
-      new DataRequest(19312, 19851, 0, 0).open('GET', 'res/shaders/p_bright.frag');
-      new DataRequest(19851, 20471, 0, 0).open('GET', 'res/shaders/p_contrast.frag');
-      new DataRequest(20471, 21483, 0, 0).open('GET', 'res/shaders/p_crtmonitor.frag');
-      new DataRequest(21483, 22834, 0, 0).open('GET', 'res/shaders/p_crtmonitor2.frag');
-      new DataRequest(22834, 23743, 0, 0).open('GET', 'res/shaders/p_cutoff.frag');
-      new DataRequest(23743, 24330, 0, 0).open('GET', 'res/shaders/p_grayscale.frag');
-      new DataRequest(24330, 24996, 0, 0).open('GET', 'res/shaders/p_mosaic.frag');
-      new DataRequest(24996, 29802, 0, 0).open('GET', 'res/shaders/p_oldfilm.frag');
-      new DataRequest(29802, 30542, 0, 0).open('GET', 'res/shaders/p_sepia.frag');
-      new DataRequest(30542, 32071, 0, 0).open('GET', 'res/shaders/p_sobel.frag');
-      new DataRequest(32071, 33281, 0, 0).open('GET', 'res/shaders/simpletex.frag');
-      new DataRequest(33281, 34314, 0, 0).open('GET', 'res/shaders/simpletex.vert');
-      new DataRequest(34314, 34556, 0, 0).open('GET', 'res/shaders/skinning-none.vert');
-      new DataRequest(34556, 36927, 0, 0).open('GET', 'res/shaders/skinning.vert');
-      new DataRequest(36927, 38189, 0, 0).open('GET', 'res/shaders/skybox.frag');
-      new DataRequest(38189, 39415, 0, 0).open('GET', 'res/shaders/skybox.vert');
-      new DataRequest(39415, 39874, 0, 0).open('GET', 'res/shaders/sprite.frag');
-      new DataRequest(39874, 40382, 0, 0).open('GET', 'res/shaders/sprite.vert');
-      new DataRequest(40382, 40620, 0, 0).open('GET', 'res/shaders/spritecol.frag');
-      new DataRequest(40620, 40867, 0, 0).open('GET', 'res/shaders/spritecol.vert');
-      new DataRequest(40867, 44725, 0, 0).open('GET', 'res/shaders/terrain.frag');
-      new DataRequest(44725, 47321, 0, 0).open('GET', 'res/shaders/terrain.vert');
-      new DataRequest(47321, 50735, 0, 0).open('GET', 'res/shaders/textured.frag');
-      new DataRequest(50735, 54901, 0, 0).open('GET', 'res/shaders/textured.vert');
-      new DataRequest(54901, 58301, 0, 0).open('GET', 'res/shaders/textured_gray.frag');
+      new DataRequest(0, 2780, 0, 0).open('GET', 'look.ax');
+      new DataRequest(2780, 5846, 0, 0).open('GET', 'res/shaders/colored.frag');
+      new DataRequest(5846, 9006, 0, 0).open('GET', 'res/shaders/colored.vert');
+      new DataRequest(9006, 9892, 0, 0).open('GET', 'res/shaders/font.frag');
+      new DataRequest(9892, 10401, 0, 0).open('GET', 'res/shaders/font.vert');
+      new DataRequest(10401, 13692, 0, 0).open('GET', 'res/shaders/lighting.frag');
+      new DataRequest(13692, 15988, 0, 0).open('GET', 'res/shaders/lighting.vert');
+      new DataRequest(15988, 17397, 0, 0).open('GET', 'res/shaders/p_blur.frag');
+      new DataRequest(17397, 18250, 0, 0).open('GET', 'res/shaders/p_blur2.frag');
+      new DataRequest(18250, 19176, 0, 0).open('GET', 'res/shaders/p_blur2.vert');
+      new DataRequest(19176, 19715, 0, 0).open('GET', 'res/shaders/p_bright.frag');
+      new DataRequest(19715, 20335, 0, 0).open('GET', 'res/shaders/p_contrast.frag');
+      new DataRequest(20335, 21347, 0, 0).open('GET', 'res/shaders/p_crtmonitor.frag');
+      new DataRequest(21347, 22698, 0, 0).open('GET', 'res/shaders/p_crtmonitor2.frag');
+      new DataRequest(22698, 23607, 0, 0).open('GET', 'res/shaders/p_cutoff.frag');
+      new DataRequest(23607, 24194, 0, 0).open('GET', 'res/shaders/p_grayscale.frag');
+      new DataRequest(24194, 24860, 0, 0).open('GET', 'res/shaders/p_mosaic.frag');
+      new DataRequest(24860, 29666, 0, 0).open('GET', 'res/shaders/p_oldfilm.frag');
+      new DataRequest(29666, 30406, 0, 0).open('GET', 'res/shaders/p_sepia.frag');
+      new DataRequest(30406, 31935, 0, 0).open('GET', 'res/shaders/p_sobel.frag');
+      new DataRequest(31935, 33145, 0, 0).open('GET', 'res/shaders/simpletex.frag');
+      new DataRequest(33145, 34178, 0, 0).open('GET', 'res/shaders/simpletex.vert');
+      new DataRequest(34178, 34420, 0, 0).open('GET', 'res/shaders/skinning-none.vert');
+      new DataRequest(34420, 36791, 0, 0).open('GET', 'res/shaders/skinning.vert');
+      new DataRequest(36791, 38053, 0, 0).open('GET', 'res/shaders/skybox.frag');
+      new DataRequest(38053, 39279, 0, 0).open('GET', 'res/shaders/skybox.vert');
+      new DataRequest(39279, 39738, 0, 0).open('GET', 'res/shaders/sprite.frag');
+      new DataRequest(39738, 40246, 0, 0).open('GET', 'res/shaders/sprite.vert');
+      new DataRequest(40246, 40484, 0, 0).open('GET', 'res/shaders/spritecol.frag');
+      new DataRequest(40484, 40731, 0, 0).open('GET', 'res/shaders/spritecol.vert');
+      new DataRequest(40731, 44589, 0, 0).open('GET', 'res/shaders/terrain.frag');
+      new DataRequest(44589, 47185, 0, 0).open('GET', 'res/shaders/terrain.vert');
+      new DataRequest(47185, 50599, 0, 0).open('GET', 'res/shaders/textured.frag');
+      new DataRequest(50599, 54765, 0, 0).open('GET', 'res/shaders/textured.vert');
+      new DataRequest(54765, 58165, 0, 0).open('GET', 'res/shaders/textured_gray.frag');
 
 
     function processPackageData(arrayBuffer) {
@@ -481,6 +466,6 @@ Module['FS_createPath']('/res', 'shaders', true, true);
 
     </script>
     <script async type="text/javascript" src="hsp3dishw-gp.js"></script>
-
+  <p><font size="2" color="#404040">powered by <a href="https://hsp.tv/make/hsp3dish.html" target="_blank">hsp3dishw-gp.js</a> / OpenHSP</font></p>
   </body>
 </html>

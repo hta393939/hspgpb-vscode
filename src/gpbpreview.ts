@@ -444,6 +444,23 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 			const u8 = await vscode.workspace.fs.readFile(templateUri);
 			ret = new TextDecoder().decode(u8);
 
+			ret = ret.replace(/<title.+\/title>/, `
+<base href="/*BASEHREFPOSITION*/" />
+<meta http-equiv="Content-Security-Policy" content="
+default-src 'none';
+connect-src /*CSPPOSITION*/ blob: data:;
+img-src /*CSPPOSITION*/ blob: data:;
+media-src /*CSPPOSITION*/ blob: data:;
+style-src /*CSPPOSITION*/ 'nonce-/*NONCEPOSITION*/';
+script-src 'wasm-unsafe-eval' /*CSPPOSITION*/ 'nonce-/*NONCEPOSITION*/';
+">
+			`);
+
+			ret = ret.replace('function runWithFS() {', `
+function runWithFS() {
+/*FSPOSITION*/
+			`);
+
 			ret = ret.replace('/*BASEHREFPOSITION*/', baseStr);
 
 			ret = ret.replace(/\/\*NONCEPOSITION\*\//g, nonce);
