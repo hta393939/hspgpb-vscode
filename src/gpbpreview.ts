@@ -20,6 +20,42 @@ interface GpbPreviewDocumentDelegate {
     getFileData(): Promise<Uint8Array>;
 }
 
+const list: string[] = [
+	'colored.frag',
+	'colored.vert',
+	'font.frag',
+	'font.vert',
+	'lighting.frag',
+	'lighting.vert',
+	'p_blur.frag',
+	'p_blur2.frag',
+	'p_blur2.vert',
+	'p_bright.frag',
+	'p_constrast.frag',
+	'p_crtmonitor.frag',
+	'p_crtmonitor2.frag',
+	'p_cutoff.frag',
+	'p_grayscale.frag',
+	'p_mosaic.frag',
+	'p_oldfilm.frag',
+	'p_sepia.frag',
+	'p_sobel.frag',
+	'simpletex.frag',
+	'simpletex.vert',
+	'skinning-none.vert',
+	'skinning.vert',
+	'skybox.frag',
+	'skybox.vert',
+	'sprite.frag',
+	'sprite.vert',
+	'spritecol.frag',
+	'spritecol.vert',
+	'terrain.frag',
+	'terrain.vert',
+	'textured_gray.frag',
+	'textured.frag',
+	'textured.vert',
+];
 
 
 /**
@@ -496,10 +532,18 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 			case '.png':
 				// 処理を続ける
 				break;
-			//case '.vert':
-			//case '.frag':
-				// Do nothing.
-				//break;
+			case '.vert':
+			case '.frag':
+				{
+					const match = list.some(end => {
+						return val.endsWith(`res/shaders/${end}`);
+					});
+					if (match) {
+						continue; // リストにあったら非対象
+					}
+					// 処理を続ける
+				}
+				break;
 			default:
 				continue; // 非対象
 			}

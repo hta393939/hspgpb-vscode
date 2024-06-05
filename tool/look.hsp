@@ -4,26 +4,8 @@
 
 #include "hgimg4.as"
 
-#module
-#deffunc _children int _id, local _s, local _childname, local _name
-	_s = ""
-	gpnodeinfo _childname, _id, GPNODEINFO_CHILD, _name
-	if stat < 0 | _childname != "" {
-		return _s
-	}
-	_s += _childname + "\r\n"
-	return _s
-
-#deffunc _statzero
-	return 0
-	
-#global
-
 #define DELTA (0.001)
 #const KEY_LBUT 0x100
-#const KEY_RBUT 0x200
-#const KEY_W 0x8000
-#const KEY_S 0x20000
 
 #define EE (2.718281828)
 
@@ -65,8 +47,6 @@
 	    errmsg = "Internal error"
 	}
 
-	//gosub *guessheight
-
 	w2 = (ps.3 - ps.0) * 0.5
     h2 = (ps.4 - ps.1) * 0.5
     d2 = (ps.5 - ps.2) * 0.5
@@ -81,7 +61,6 @@
     lati = 0.0
     premousew = mousew
 
-	//exp2 = logf(radius) / EE
 	step = radius / 128.0
 
 	far = radius * 4.0
@@ -99,7 +78,7 @@
 *main
 	curdown = 0	//
 
-	stick key, 0x3ff | KEY_W | KEY_S
+	stick key, 0x3ff
 	down = key & KEY_LBUT
 	if down {
 		curdown = 1
@@ -114,7 +93,7 @@
 				longi = - double(curx - keepx) + keeplongi
 				lati = double(cury - keepy) + keeplati
 			} else {
-				radius = double(cury - keepy) * step / 8.0 + keepradius
+				radius = - double(cury - keepy) * step / 4.0 + keepradius
 			}
 		} else {
 			// release
@@ -142,20 +121,6 @@
 		lati = -90.0 + DELTA
 	}
 	predown = curdown
-	
-
-// wheel
-    mw = mousew
-	radius += double(mw) * 0.2
-    premousew = mw
-
-// fw or bw
-	if key & KEY_W {
-		radius -= step
-	}
-	if key & KEY_S {
-		radius += step
-	}
 
 	if radius < DELTA {
 		radius = DELTA
@@ -180,6 +145,9 @@
     color 0, 0, 0
     boxf
 
+    color 204, 102, 0
+    boxf 0, 0, 31, 512
+
     setpos cameraid, x, y, z
     gplookat cameraid, lookat.0, lookat.1, lookat.2
 
@@ -187,17 +155,14 @@
 
 
     color 255, 255, 255
-    pos 8, 8
+    pos 32 + 8, 8
     if (id < 0) {
         color 255, 0, 0
         print errmsg
     } else {
-	    print "OK, " + radius + ", "
-	    print note
+	    print "OK, " + radius
 	    print strf("%.3f", ps.3) + strf(", %.3f", ps.4) + strf(", %.3f", ps.5)
-	    print key
 	    print strf("%.3f", x) + strf(", %.3f", y) + strf(", %.3f", z)
-	    print strf("%.3f", w2) + strf(", %.3f", h2) + strf(", %.3f", d2)
 	}
 
     redraw 1
