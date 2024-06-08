@@ -421,9 +421,6 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 				fsPosition += `\nvar _name = '${lines.join('\\n')}';\n`;
 				fsPosition += `var _buf = new TextEncoder().encode(_name);\n`;
 				fsPosition += `Module['FS_createPreloadedFile']('/', '_name.txt', _buf, true, true);\n`;
-
-				//fsPosition += `Module['FS_createPreloadedFile']('/', 'look.ax', './look.ax', true, true)`;
-
 			} catch (ec) {
 				vscode.window.showWarningMessage(`Error occured`);
 				return `Error occured`;
@@ -518,6 +515,9 @@ function runWithFS() {
 			// shiftjis
 		}
 
+		/**
+		 * 対象モデルファイルの / スプリット
+		 */
 		const wsLayers = modelDirUri.path.split('/');
 
 // 2つのファイルを登録する
@@ -565,12 +565,16 @@ function runWithFS() {
 				continue; // 非対象
 			}
 			
+			/**
+			 * .material の値として記載されている文字列の / スプリット
+			 */
 			const layers = val.split('/');
 			{ // モデル基準
 				try {
 					const candUri = vscode.Uri.joinPath(
 						modelDirUri, ...layers,
 					);
+					console.log('candUri', candUri.toString(), layers);
 
 					const stat = await vscode.workspace.fs.stat(candUri);
 					str += `, ${candUri.toString()} ${stat.size}\\n`;
@@ -588,18 +592,24 @@ function runWithFS() {
 					continue;
 				} catch (ec) {
 					str += `, ${ec?.toString()}\\n`;
+					console.log('%cmodel base catch',
+						'color:mediumpurple',
+						ec?.toString());
 				}
 				vscode.window.showInformationMessage(`model, ${str}`);
 			}
 
 			{ // 1つずつ上がっていく
-				while(wsLayers.length > 0) {
+				const wsLayersClone = [...wsLayers];
+				while(wsLayersClone.length > 0) {
 					try {
-						wsLayers.pop();
+						//wsLayers.pop();
 						
 						const guessDirUri = modelDirUri.with({
-							path: wsLayers.join('/'),
+							path: wsLayersClone.join('/'),
 						});
+						wsLayersClone.pop();
+
 						const candUri = vscode.Uri.joinPath(
 							guessDirUri, ...layers,
 						);
@@ -619,13 +629,15 @@ function runWithFS() {
 						break;
 					} catch (ec) {
 						str += `, ${ec?.toString()}\\n`;
+						console.log('%cdepth catch', 'color:mediumpurple', ec?.toString());
 					}
-					//vscode.window.showInformationMessage(`up ${candUri.toString()}`);
 				}
 			}
 		}
 
-		vscode.window.showInformationMessage(str);
+		if (true) {
+			vscode.window.showWarningMessage(str);
+		}
 		return ret;
 	}
 

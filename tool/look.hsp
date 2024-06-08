@@ -74,18 +74,21 @@
 	predown = 0
 	keeplongi = longi
 	keeplati = lati
+	mode = "pan"
+	isplay = 0
 
 *main
-	curdown = 0	//
+	curdown = 0
 
-	stick key, 0x3ff
+	stick key, KEY_LBUT
 	down = key & KEY_LBUT
 	if down {
 		curdown = 1
-		curx = mousex
-		cury = mousey
 	}
+	curx = mousex
+	cury = mousey
 
+	iszoomdraw = 0
 	if predown {
 		if curdown {
 			if mode == "pan" {
@@ -97,12 +100,23 @@
 			}
 		} else {
 			// release
+			mode = "pan"
+			if 1 <= curx & curx < 32 {
+				iszoomdraw = 1
+			} else {
+				
+			}
 		}
 	} else {
 		if curdown { // start action
-			if curx < 32 { // ¶’[‚ÍƒY[ƒ€‚Æ‚·‚é
+			if 1 <= curx & curx < 32 { // zoom area
 				mode = "zoom"
 			} else {
+				if 1 <= cury & cury < 32 {
+					isplay = 1 - isplay
+					gosub *anim
+				}
+
 				mode = "pan"
 			}
 			keepx = curx
@@ -112,15 +126,24 @@
 			keepradius = radius
 		} else {
 			// no action
+			if 1 <= curx & curx < 32 { // hover zoom area
+				iszoomdraw = 1
+			} else {
+				
+			}
 		}
 	}
+	predown = curdown
+	if mode == "zoom" {
+		iszoomdraw = 1
+	}
+	
 	if lati >= 90.0 {
 		lati = 90.0 - DELTA
 	}
 	if lati <= -90.0 {
 		lati = -90.0 + DELTA
 	}
-	predown = curdown
 
 	if radius < DELTA {
 		radius = DELTA
@@ -143,10 +166,16 @@
     redraw 0
 
     color 0, 0, 0
-    boxf
+    boxf 0, 0, 512, 512
 
-    color 204, 102, 0
-    boxf 0, 0, 31, 512
+	if 0 {
+		color 128, 128, 160
+		boxf 32, 1, 512, 32
+	}
+	if iszoomdraw {
+	    color 128, 128, 128
+    	boxf 1, 0, 31, 512
+    }
 
     setpos cameraid, x, y, z
     gplookat cameraid, lookat.0, lookat.1, lookat.2
@@ -155,12 +184,12 @@
 
 
     color 255, 255, 255
-    pos 32 + 8, 8
+    pos 32 + 8, 32 + 8
     if (id < 0) {
         color 255, 0, 0
         print errmsg
     } else {
-	    print "OK, " + radius
+	    print "OK, " + radius + strf(", %.3f", curx) + strf(", %.3f", cury)
 	    print strf("%.3f", ps.3) + strf(", %.3f", ps.4) + strf(", %.3f", ps.5)
 	    print strf("%.3f", x) + strf(", %.3f", y) + strf(", %.3f", z)
 	}
@@ -168,4 +197,15 @@
     redraw 1
     await 1000/30
     goto *main
+
+*anim
+	if id < 0 {
+		return
+	}
+	if isplay {
+		gpact id, "", GPACT_PLAY
+	} else {
+		gpact id, "", GPACT_PAUSE
+	}
+	return
 
