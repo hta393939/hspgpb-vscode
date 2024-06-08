@@ -5,7 +5,7 @@
 (function(_global) {
 
 const log = {
-  log: console.log.bind(null),
+  log: () => {},
 };
 
 /**
@@ -437,8 +437,8 @@ class Model {
     const gr = { userData: {} };
     gr.userData.gpbscene = {};
     gr.userData.anims = [];
+    gr.userData.hasFont = false;
     {
-      let c = 0;
       { // マテリアル
 
       }
@@ -456,8 +456,17 @@ class Model {
             offset: this.r32s(p, 1)[0],
           });
           this._reftable.references.push(ref);
+
+          if (ref.type === Reference.FONT) {
+            gr.userData.hasFont = true;
+          }
         }
       }
+
+      if (gr.userData.hasFont) {
+        return gr;
+      }
+
       { // メッシュ
         const meshNum = this.r32s(p, 1)[0];
         log.log('meshNum', meshNum);
@@ -750,7 +759,13 @@ class Model {
     return ret;
   }
 
-
+/**
+ * 
+ * @param {(...args)=>void} f 
+ */
+  setLog(f) {
+    log.log = f;
+  }
 }
 
 _global.GPB = _global.GPB || {};

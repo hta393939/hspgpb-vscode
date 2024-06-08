@@ -19,23 +19,30 @@
     }
 
     async _initElements(/** @type {HTMLElement} */ parent) {
+      console.log('_initElements');
 /**
  * @type {HTMLCanvasElement}
  */
       const canvas = document.createElement('canvas');
+      canvas.id = 'main';
       canvas.width = this.width;
       canvas.height = this.height;
       parent.appendChild(canvas);
-
-      this.initGL(canvas);
-      this.update();
 
       {
         const url = document.body.getAttribute('data-url');
         const res = await fetch(url || '');
         const ab = await res.arrayBuffer();
         const u8buf = new Uint8Array(ab);
-        await this.reset(u8buf);
+        const hasFont = await this.reset(u8buf);
+        if (hasFont) {
+          const font = new Font();
+          font.init(URL.createObjectURL(new Blob([ab])));
+          return;
+        }
+
+        this.initGL(canvas);
+        this.update();
       }
     }
 
@@ -79,7 +86,17 @@
       {
         try {
           const model = new GPB.Model();
+          model.setLog((...args) => {
+            console.log(...args);
+          });
           model.parseGPB(val.buffer);
+
+          const hasFont = model._reftable.references.some(ref => {
+            return ref.type === GPB.Reference.FONT;
+          });
+          if (hasFont) {
+            return true;
+          }
 
           const maker = new GPB.Maker();
           const gr = maker.makeModel(model);
@@ -102,7 +119,7 @@
         }
 
       }
-
+      return false;
     }
 
     update() {

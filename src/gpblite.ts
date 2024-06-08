@@ -324,24 +324,23 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
       </head>
       <body data-url="${targetWV.toString()}">
         <div class="tobottom">
-          <div class="red text0">0</div>
-          <div class="green text1">1</div>
+          <div id="info" class="red text0">0</div>
         </div>
         <details open>
           <summary class="pt">情報</summary>
           <div class="toright">
           ${targetWV.toString()}
             <div class="purple">purple</div>
-            <div class="red">red</div>
-            <div class="green">green</div>
           </div>
         </details>
-        <div class="drawing-canvas"></div>
+        <div class="drawing-canvas">
+        </div>
 
         <script nonce="${nonce}" src="third_party/three.min.js"></script>
         <script nonce="${nonce}" src="third_party/OrbitControls.js"></script>
         <script nonce="${nonce}" src="lib/gpb.js"></script>
         <script nonce="${nonce}" src="lib/gpbthree.js"></script>
+        <script nonce="${nonce}" src="font.js"></script>
         <script nonce="${nonce}" src="gpblite.js"></script>
       </body>
       </html>`;
