@@ -504,8 +504,6 @@ function runWithFS() {
 			path: targetUri.path.replace(/\.(material|gpb)$/, '.material'),
 		});
 
-		//vscode.window.showInformationMessage(`parse ${materialUri.toString()}`);
-
 		const modelDirUri = dirname(materialUri);
 		const u8buf = await vscode.workspace.fs.readFile(materialUri);
 		let text = '';
@@ -537,6 +535,8 @@ function runWithFS() {
 		//str += `p,${lines.length},`;
 		const reExt = /(?<ext>\.[^.]*)$/;
 
+		const notfounds = [];
+
 		for (const line of lines) {
 			const ss = line.split('=').map(v => v.trim());
 			if (ss.length !== 2) {
@@ -556,6 +556,7 @@ function runWithFS() {
 						return val.endsWith(`res/shaders/${end}`);
 					});
 					if (match) {
+						console.log('found in list');
 						continue; // リストにあったら非対象
 					}
 					// 処理を続ける
@@ -596,10 +597,10 @@ function runWithFS() {
 						'color:mediumpurple',
 						ec?.toString());
 				}
-				vscode.window.showInformationMessage(`model, ${str}`);
 			}
 
 			{ // 1つずつ上がっていく
+				let found = false;
 				const wsLayersClone = [...wsLayers];
 				while(wsLayersClone.length > 0) {
 					try {
@@ -626,21 +627,26 @@ function runWithFS() {
 							emsFile.emsDir = '/' + layers.join('/');
 						}
 						ret.emsFiles.push(emsFile);
+						found = true;
 						break;
 					} catch (ec) {
 						str += `, ${ec?.toString()}\\n`;
 						console.log('%cdepth catch', 'color:mediumpurple', ec?.toString());
 					}
 				}
+
+				if (!found) {
+					notfounds.push(val);
+				}
 			}
 		}
 
-		if (true) {
-			vscode.window.showWarningMessage(str);
+		if (notfounds.length >= 1) {
+			const text = `Fail find ${notfounds.join(', ')}`;
+			vscode.window.showWarningMessage(text);
 		}
 		return ret;
 	}
-
 
 
 	private _requestId = 1;

@@ -233,11 +233,24 @@ class Part {
  */
   static GL_UNSIGNED_SHORT = 0x1403;
 
+  static GL_TRIANGLES = 4;
+  /**
+   * 始点終点
+   */
+  static GL_LINES = 1;
+  static GL_POINTS = 0;
+
+  static primmap = {
+    [Part.GL_POINTS]: 'GL_POINTS',
+    [Part.GL_LINES]: 'GL_LINES',
+    [Part.GL_TRIANGLES]: 'GL_TRIANGLES',
+  };
+
   constructor() {
 /**
  * 1つめ
  */
-    this.foo = 0;
+    this.primitiveType = Part.GL_TRIANGLES;
 /**
  * 面頂点インデックスの要素型(u16 or u32)
  * @default {Part.GL_UNSIGNED_SHORT}
@@ -552,7 +565,7 @@ class Model {
             const indexmax = Math.max(...fis);
             log.log('indexmax', indexmax); // 範囲チェック向け
 
-            part.foo = fiattr[0];
+            part.primitiveType = fiattr[0];
             part.faceIndexElement = fiattr[1];
             part.fis = fis;
             gpbmesh.parts.push(part);
@@ -621,14 +634,26 @@ class Model {
                 ft += 10;
                 targetobj.keys.push(pqs);
               }
+            } else if (targetobj.attr === 16) {
+              const minnum = Math.min(numtime, Math.floor(valnum / 7));
+              let ft = 0;
+              for (let k = 0; k < minnum; ++k) {
+                const pqs = {
+                  time: targetobj.times[k],
+                  q: [vals[ft+0], vals[ft+1], vals[ft+2], vals[ft+3]],
+                  p: [vals[ft+4], vals[ft+5], vals[ft+6]],
+                };
+                ft += 7;
+                targetobj.keys.push(pqs);
+              }
             }
 
-            const b = this.r32s(p, 1)[0];
-            targetobj.bs = this.rfs(p, b);
-            const c = this.r32s(p, 1)[0];
-            targetobj.cs = this.rfs(p, c);
-            const d = this.r32s(p, 1)[0];
-            targetobj.ds = this.rfs(p, d);
+            const numin = this.r32s(p, 1)[0];
+            targetobj.tangentsin = this.rfs(p, numin);
+            const numout = this.r32s(p, 1)[0];
+            targetobj.tangentsout = this.rfs(p, numout);
+            const numip = this.r32s(p, 1)[0];
+            targetobj.interpolations = this.r32s(p, numip);
           }
         }
       }
@@ -682,7 +707,11 @@ class Model {
         }
 
         const bpnum = this.r32s(p, 1)[0];
-        this.rfs(p, bpnum);
+        for (let i = 0; i < jointnum; ++i) {
+          const jmatrix = this.rfs(p, 16);
+          const _translate = [jmatrix[12], jmatrix[13], jmatrix[14]];
+          console.log('平行移動成分', _translate);
+        }
       }
 
       const mtlnum = this.r32s(p, 1)[0];
@@ -706,9 +735,10 @@ class Model {
  */
   parseGPB(ab) {
     const p = new DataView(ab);
-    this.parse(p, (arg) => {
+    const gr = this.parse(p, (arg) => {
       console.warn('error fire', arg);
     });
+    return gr;
   }
 
 /**

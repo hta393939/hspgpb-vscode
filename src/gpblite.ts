@@ -328,10 +328,7 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
         </div>
         <details open>
           <summary class="pt">情報</summary>
-          <div class="toright">
-          ${targetWV.toString()}
-            <div class="purple">purple</div>
-          </div>
+          <div class="toright"></div>
         </details>
         <div class="drawing-canvas">
         </div>

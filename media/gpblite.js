@@ -15,6 +15,10 @@
       this.width = 512;
       this.height = 512;
 
+      this.firsttarget = [0, 0, 0];
+      this.firstpos = [0, 0, 1];
+      this.axisSize = 10;
+
       this._initElements(parent);
     }
 
@@ -57,16 +61,18 @@
       const rads = [0, 1, 2].map(index => {
         return (cover.max[index] - cover.min[index]) * 0.5;
       });
+      const maxRange = Math.max(rads[0], rads[1]);
 
       const ang = fovdeg * Math.PI * 0.5 / 180;
       const pos = new THREE.Vector3(
         target.x,
         target.y,
-        target.z + rads[1] / Math.tan(ang) + rads[2]
+        target.z + maxRange * 1.25 / Math.tan(ang) + rads[2]
       );
 
-// 軸長さ評価するか??
-        //axisSize = 100;
+      this.firsttarget = target.toArray();
+      this.firstpos = pos.toArray();
+      //this.axisSize = 100;
 
       const el = document.querySelector('.text0');
       if (el) {
@@ -76,6 +82,8 @@
       this.control.target0.copy(target);
       this.control.position0.copy(pos);
       this.control.reset();
+
+      console.log('adjustCamera', target, pos, fovdeg, ang);
     }
 
 /**
@@ -89,7 +97,7 @@
           model.setLog((...args) => {
             console.log(...args);
           });
-          model.parseGPB(val.buffer);
+          const parsedGr = model.parseGPB(val.buffer);
 
           const hasFont = model._reftable.references.some(ref => {
             return ref.type === GPB.Reference.FONT;
@@ -97,6 +105,9 @@
           if (hasFont) {
             return true;
           }
+
+          console.log('%cparsed', 'color:deepskyblue',
+            model, parsedGr);
 
           const maker = new GPB.Maker();
           const gr = maker.makeModel(model);
@@ -153,10 +164,9 @@
         0.02, 1000);
       this.camera = camera;
       {
-        let axisSize = 10;
-        const pos = new THREE.Vector3(1, 1, 5);
+        const pos = new THREE.Vector3(...this.firstpos);
         // 中心
-        const target = new THREE.Vector3(0, 1, 0);
+        const target = new THREE.Vector3(...this.firsttarget);
 
         camera.position.copy(pos);
         camera.lookAt(target);
@@ -165,7 +175,7 @@
         this.control = control;
         control.target = target;
 
-        const axes = new THREE.AxesHelper(axisSize);
+        const axes = new THREE.AxesHelper(this.axisSize);
         scene.add(axes);
       }
 
@@ -174,7 +184,7 @@
         scene.add(light);
       }
 
-      if (this.gr) {
+      if (this.gr) { // 先にグループが生成されていたら追加する
         scene.add(this.gr);
       }
     }

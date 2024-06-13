@@ -5,6 +5,9 @@ class Font {
 
   constructor() {
     this.c = 0;
+
+    this.major = 1;
+    this.minor = 5;
   }
   async init(url) {
     console.log('init', url);
@@ -61,6 +64,16 @@ class Font {
 /**
  * 
  * @param {DataView} p 
+ */
+  u8(p) {
+    const val = p.getUint8(this.c);
+    this.c += 1;
+    return val;
+  }
+
+/**
+ * 
+ * @param {DataView} p 
  * @returns 
  */
   str(p) {
@@ -82,7 +95,9 @@ class Font {
     const p = new DataView(inbuf);
     this.c = 0;
 
-    this.c += 11;
+    this.c += 9;
+    this.major = this.u8(p);
+    this.minor = this.u8(p);
 
     let fontOffset = -1;
     const num = this.i32(p);
@@ -119,21 +134,26 @@ class Font {
 
     const el = document.getElementById('info');
     let str = '';
-
+    // family
     this.name = this.str(p); // "Arial" など
+    const style = this.i32(p);
 
-    this.i32(p);
-    this.i32(p);
-    this.i32(p);
-    this.i32(p);
+    let fontSizeCount = 1;
+    if (this.major >= 1 && this.minor >= 4) {
+      fontSizeCount = this.i32(p);
+    }
 
+    const size = this.i32(p);
+    const charset = this.str(p);
     const glyphnum = this.i32(p);
 
     for (let i = 0; i < glyphnum; ++i) {
-      this.i32(p);
-      this.i32(p);
-      this.i32(p);
-      this.i32(p);
+      this.i32(p); // code
+      this.i32(p); // width
+      if (this.major >= 1 && this.minor >= 5) {
+        this.i32(p); // bearingX
+        this.i32(p); // advance
+      }
       this.f32(p);
       this.f32(p);
       this.f32(p);
@@ -145,7 +165,7 @@ class Font {
     const bytenum = this.i32(p);
     console.log('bitmap', w, h, bytenum);
 
-    str = `${this.name}, ${glyphnum} glyph`;
+    str = `${this.name}, style ${style}, size ${size}, ${glyphnum} glyph`;
     el.textContent = str;
 
     const canvas = document.getElementById('main');
