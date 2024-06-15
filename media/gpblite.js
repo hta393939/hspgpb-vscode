@@ -19,6 +19,9 @@
       this.firstpos = [0, 0, 1];
       this.axisSize = 10;
 
+      this.near = 0.02;
+      this.far = 1000;
+
       this._initElements(parent);
     }
 
@@ -64,19 +67,22 @@
       const maxRange = Math.max(rads[0], rads[1]);
 
       const ang = fovdeg * Math.PI * 0.5 / 180;
+      const radius = maxRange * 1.25 / Math.tan(ang) + rads[2];
       const pos = new THREE.Vector3(
         target.x,
         target.y,
-        target.z + maxRange * 1.25 / Math.tan(ang) + rads[2]
+        target.z + radius,
       );
 
       this.firsttarget = target.toArray();
       this.firstpos = pos.toArray();
+      this.far = radius * 4;
+      this.near = radius / 256.0;
       //this.axisSize = 100;
 
       const el = document.querySelector('.text0');
       if (el) {
-        el.textContent = `${ang}, ${target.y} ${target.z} ${pos.z}`;
+        //el.textContent = `${ang}, ${target.y} ${target.z} ${pos.z}`;
       }
 
       this.control.target0.copy(target);
@@ -126,7 +132,7 @@
 
         const q = document.querySelector('.text1');
         if (q) {
-          q.textContent = text;
+          //q.textContent = text;
         }
 
       }
@@ -161,7 +167,7 @@
 
       const camera = new THREE.PerspectiveCamera(this.fovdeg,
         this.width / this.height,
-        0.02, 1000);
+        this.near, this.far);
       this.camera = camera;
       {
         const pos = new THREE.Vector3(...this.firstpos);

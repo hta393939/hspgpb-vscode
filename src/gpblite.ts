@@ -324,12 +324,16 @@ export class GpbLiteProvider implements vscode.CustomEditorProvider<GpbLiteDocum
       </head>
       <body data-url="${targetWV.toString()}">
         <div class="tobottom">
-          <div id="info" class="red text0">0</div>
+          <div id="info" class="red text0"></div>
         </div>
+
+        <!--
         <details open>
           <summary class="pt">情報</summary>
           <div class="toright"></div>
         </details>
+        -->
+
         <div class="drawing-canvas">
         </div>
 
