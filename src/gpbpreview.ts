@@ -398,7 +398,6 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 		const nonce = getNonce();
 
 		let ret = `<html><body>n/a</body></html>`;
-		let str = 'material<br />';
 
 		let fsPosition = '/* emscripten empty replace */';
 		if (!isFont) {
@@ -441,6 +440,8 @@ export class GpbPreviewProvider implements vscode.CustomEditorProvider<GpbPrevie
 			const u8 = await vscode.workspace.fs.readFile(templateUri);
 			ret = new TextDecoder().decode(u8);
 
+			ret = ret.replace(/\<p>.*\<\/p>/g, '');
+
 			ret = ret.replace(/<title.+\/title>/, `
 <base href="/*BASEHREFPOSITION*/" />
 <meta http-equiv="Content-Security-Policy" content="
@@ -471,11 +472,10 @@ function runWithFS() {
 
 			ret = ret.replace('/*FSPOSITION*/', fsPosition);
 
-		} catch(ec: unknown) {
-			str += `catch ${ec?.toString()}`;
+		} catch (ec: unknown) {
+			vscode.window.showWarningMessage(`Error occured`);
+			return `Error occured`;
 		}
-
-		//vscode.window.showInformationMessage(str);
 		return ret;
 	}
 
