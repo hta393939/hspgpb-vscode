@@ -7,7 +7,8 @@ HSP3 hgimg4 で3Dモデルとして使用する.gpbファイルの
 
 ## Features
 
-- HSP3 HGIMG4 によるgpbモデルのプリビュー機能
+- HSP3 HGIMG4 によるgpbモデルのプレビュー機能
+   - gpbファイルを選択するとプレビュー表示します
 - materialファイルのハイライト機能
 - (オマケ)gpbフォントファイルのビットマッププレビュー機能
 - (オマケ)gpbファイルのパース機能
@@ -15,6 +16,7 @@ HSP3 hgimg4 で3Dモデルとして使用する.gpbファイルの
 
 (en)
 - Preview gpb 3D model file by HSP3 HGIMG4
+   - Preview gpb file by select in VSCode
 - Highlight material file
 - (Appendix) Preview gpb font file
 - (Appendix) Parse gpb file
