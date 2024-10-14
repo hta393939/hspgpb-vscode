@@ -40,6 +40,20 @@ HSP3 hgimg4 で3Dモデルとして使用する.gpbファイルの
 
 ## Release Notes
 
+### 0.2.0
+
+注: パブリッシャーのミススペルを修正したため(1文字足りなかった)
+0.1.1 とは別拡張として扱われてしまうため
+一旦、0.1.1 をアンインストールしてから 0.2.0 以降をインストールしてください。
+
+右クリックのパース時のログ出力を強化した。
+
+(en) Warning!   
+Please uninstall ver.0.1.1 before ver.0.2.0 installing
+because publisher typo fixed.
+
+Add dump log in parsed.
+
 ### 0.1.1
 
 初回公開。
