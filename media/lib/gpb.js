@@ -730,11 +730,11 @@ class Model {
     return gr;
   }
 
-/**
- * ノード読み込み
- * @param {DataView} p 
- * @returns {GPBNode}
- */
+  /**
+   * ノード読み込み
+   * @param {DataView} p 
+   * @returns {GPBNode}
+   */
   readNode(p) {
     log.log('readNode called');
     const curPos = this.dumpPos();
