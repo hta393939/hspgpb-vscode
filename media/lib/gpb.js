@@ -148,10 +148,15 @@ class Node {
     this.id = '';
     this.type = '';
     this.transform = [];
-/**
- * @type {Node[]}
- */
+    /**
+     * @type {Node[]}
+     */
     this.children = [];
+
+    /**
+     * 読み取り個数
+     */
+    this._childnum = 0;
   }
 }
 
@@ -744,22 +749,29 @@ class Model {
     node.matrix = this.rfs(p, 16);
     node.parentname = this.rs(p);
 
+    this.mark();
     const cnum = this.r32s(p, 1)[0];
+    node._childnum = cnum;
+    this.dumpMarkPos(`ノード子個数`, cnum);
     for (let i = 0; i < cnum; ++i) {
       const cnode = this.readNode(p);
       node.children.push(cnode);
     }
 
+    this.mark();
     node.camlight = this.r8s(p, 2); // カメラ、ライト
+    this.dumpMarkPos('カメラライト', node.camlight);
 
+    this.mark();
     node.modelname = this.rs(p);
 
     if (node.modelname !== '') {
-      log.log('モデル名', node.modelname);
+      this.dumpMarkPos('モデル名', node.modelname);
 
+      this.mark();
       node.isskin = this.r8s(p, 1)[0]; // スキン
       if (node.isskin > 0) {
-        log.log('スキンあるよ');
+        this.dumpMarkPos('スキンあるよ');
 
         this.rfs(p, 16);
 
