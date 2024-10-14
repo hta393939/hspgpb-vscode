@@ -297,6 +297,7 @@ class Reference {
   static FONT = 128;
   constructor() {
     this.xref = '';
+    this.name = '';
     this.type = 0;
     this.offset = 0;
   }
@@ -318,51 +319,56 @@ class RefTable {
  */
 class Model {
 
-/**
- * コンストラクター
- */
+  /**
+   * コンストラクター
+   */
   constructor() {
-/**
- * @type {RefTable}
- */
+    /**
+     * @type {RefTable}
+     */
     this._reftable = new RefTable();
-/**
- * @type {Mesh[]}
- */
+    /**
+     * @type {Mesh[]}
+     */
     this._meshes = [];
-/**
- * @type {Scene}
- */
+    /**
+     * @type {Scene}
+     */
     this._scene = new Scene();
-/**
- * @type {Animations[]}
- */
+    /**
+     * @type {Animations[]}
+     */
     this._animations = [];
 
 
 
     this.creator = null;
-/**
- * ファイル全体の先頭からのオフセットカーソル位置
- * @type {number}
- */
+    /**
+     * ファイル全体の先頭からのオフセットカーソル位置
+     * @type {number}
+     */
     this.cur = 0;
+
+    /**
+     * 保持位置
+     */
+    this.markPos = 0;
   }
 
-/**
- * .material ファイルの解析をセットする
- * @param {*} creator 
- */
+  /**
+   * .material ファイルの解析をセットする
+   * @param {*} creator 
+   */
   setMaterials(creator) {
     this.creator = creator;
   }
 
-/**
- * UTF-8 とみなして文字列取り出す(not Shift_JIS)
- * @param {DataView} p 
- * @param {number} inc 
- * @returns {string}
- */
+  /**
+   * UTF-8 とみなして文字列取り出す(not Shift_JIS)
+   * @param {DataView} p 
+   * @param {number} inc 
+   * @returns {string}
+   */
   rs(p) {
     const len = p.getUint32(this.cur, true);
     if (len >= 65536) {
@@ -374,12 +380,12 @@ class Model {
     return new TextDecoder().decode(src);
   }
 
-/**
- * float 32bit 複数読み出し
- * @param {DataView} p 
- * @param {number} num 
- * @returns {Float32Array}
- */
+  /**
+   * float 32bit 複数読み出し
+   * @param {DataView} p 
+   * @param {number} num 
+   * @returns {Float32Array}
+   */
   rfs(p, num) {
     const ret = new Float32Array(num);
     for (let i = 0; i < num; ++i) {
@@ -389,11 +395,11 @@ class Model {
     return ret;
   }
 
-/**
- * 8bit 符号無し整数複数読み出し
- * @param {DataView} p 
- * @returns {Uint8Array}
- */
+  /**
+   * 8bit 符号無し整数複数読み出し
+   * @param {DataView} p 
+   * @returns {Uint8Array}
+   */
   r8s(p, num) {
     const ret = new Uint8Array(num);
     for (let i = 0; i < num; ++i) {
@@ -403,11 +409,11 @@ class Model {
     return ret;
   }
 
-/**
- * 16bit 符号無し整数複数読み出し
- * @param {DataView} p 
- * @returns {Uint16Array}
- */
+  /**
+   * 16bit 符号無し整数複数読み出し
+   * @param {DataView} p 
+   * @returns {Uint16Array}
+   */
   r16s(p, num) {
     const ret = new Uint16Array(num);
     for (let i = 0; i < num; ++i) {
@@ -417,12 +423,12 @@ class Model {
     return ret;
   }
 
-/**
- * 32bit 符号在り整数複数読み出し
- * @param {DataView} p 
- * @param {number} 個数
- * @returns {Int32Array}
- */
+  /**
+   * 32bit 符号在り整数複数読み出し
+   * @param {DataView} p 
+   * @param {number} 個数
+   * @returns {Int32Array}
+   */
   r32s(p, num) {
     const ret = new Int32Array(num);
     for (let i = 0; i < num; ++i) {
@@ -432,20 +438,68 @@ class Model {
     return ret;
   }
 
-/**
- * 現在カーソルのダンプ
- */
+  /**
+   * 現在カーソルのダンプ
+   */
   dumpPos(...args) {
     let s = this.cur.toString(16).padStart(4, '0');
     log.log(`hex: 0x${s}`, ...args);
+    return this.cur;
   }
 
-/**
- * 
- * @param {DataView} p 
- * @param {Function} onErr 
- * @returns {Object}
- */
+  mark() {
+    this.markPos = + this.cur;
+  }
+
+  dumpMarkPos(...args) {
+    let s = this.markPos.toString(16).padStart(4, '0');
+    log.log(`hex: 0x${s}`, ...args);
+    return this.markPos;
+  }
+
+  checkChunk(pos) {
+    const num = this._reftable.references.length;
+    const chunks = [];
+    for (let i = 0; i < num; ++i) {
+      const ref = this._reftable.references[i];
+      if (ref.offset === pos) {
+        log.log(`chunk match`, ref.name);
+        return;
+      }
+      chunks.push({
+        index: i,        
+        ref,
+      });
+    }
+
+    chunks.sort((a, b) => {
+      return (a.ref.offset - b.ref.offset);
+    });
+
+    for (let i = 0; i < num; ++i) {
+      const isOver = (chunks[i].ref.offset > pos);
+      if (isOver || i === num - 1) {
+        for (let j = (isOver ? 0 : 1); j < 2; ++j) {
+          let index = i - 1 + j;
+          if (index < 0 || num <= index) {
+            continue;
+          }
+          const ref = chunks[index].ref;
+          let s = ref.offset.toString(16).padStart(4, '0');
+          log.log(`chunk no match, hex: 0x${s}`, ref.name);
+        }
+        return;
+      }
+    }
+
+  }
+
+  /**
+   * 
+   * @param {DataView} p 
+   * @param {Function} onErr 
+   * @returns {Object}
+   */
   parse(p, onErr) {
     const gr = { userData: {} };
     gr.userData.gpbscene = {};
@@ -481,8 +535,10 @@ class Model {
       }
 
       { // メッシュ
+        this.mark();
         const meshNum = this.r32s(p, 1)[0];
         log.log('meshNum', meshNum);
+        this.dumpMarkPos(`meshNum`, meshNum);
 
         for (let i = 0; i < meshNum; ++i) {
 /**
@@ -572,14 +628,19 @@ class Model {
           }
         }
       }
+
+      this.mark();
       const blockNum = this.r32s(p, 1)[0];
-      this.dumpPos('blockNum 後 シーン前', blockNum);
+      this.dumpMarkPos('ブロック数', blockNum);
       { // シーン
         const gpbscene = new GPB.Scene();
 
         gr.userData.gpbscene.nodes = [];
 
+        this.checkChunk(this.cur);
+        this.mark();
         const cnum = this.r32s(p, 1)[0];
+        this.dumpMarkPos(`シーン, 子個数`, cnum);
         for (let i = 0; i < cnum; ++i) {
           const node = this.readNode(p);
 
@@ -595,6 +656,7 @@ class Model {
 
       if (blockNum >= 2) { // アニメ
         log.log('animation chunk');
+        this.checkChunk(this.cur);
 
         const numanim = this.r32s(p, 1)[0];
         for (let i = 0; i < numanim; ++i) {
@@ -670,7 +732,8 @@ class Model {
  */
   readNode(p) {
     log.log('readNode called');
-    this.dumpPos();
+    const curPos = this.dumpPos();
+    this.checkChunk(curPos);
 
     const node = {
       children: [],
@@ -692,35 +755,40 @@ class Model {
     node.modelname = this.rs(p);
 
     if (node.modelname !== '') {
-      console.log('モデル名', node.modelname);
+      log.log('モデル名', node.modelname);
 
       node.isskin = this.r8s(p, 1)[0]; // スキン
       if (node.isskin > 0) {
-        console.log('スキンあるよ');
+        log.log('スキンあるよ');
 
         this.rfs(p, 16);
 
         const jointnum = this.r32s(p, 1)[0];
         for (let i = 0; i < jointnum; ++i) {
           const jointname = this.rs(p);
-          console.log('参照ジョイント名 for 行列', 'jointname', jointname);
+          log.log('参照ジョイント名 for 行列', 'jointname', jointname);
         }
 
+        this.mark();
         const bpnum = this.r32s(p, 1)[0];
+        const ok = (jointnum * 16 === bpnum);
+        this.dumpMarkPos(`逆行列成分数`, bpnum, ok ? '一致' : '不一致');
         for (let i = 0; i < jointnum; ++i) {
           const jmatrix = this.rfs(p, 16);
           const _translate = [jmatrix[12], jmatrix[13], jmatrix[14]];
-          console.log('平行移動成分', _translate);
+          log.log('平行移動成分', _translate);
         }
+
       }
 
+      this.mark();
       const mtlnum = this.r32s(p, 1)[0];
-      this.dumpPos('mtlnum', mtlnum);
+      this.dumpMarkPos('mtlnum', mtlnum);
       for (let i = 0; i < mtlnum; ++i) {
         const mtlname = this.rs(p);
         node.materials.push(mtlname);
 
-        console.log('参照材質', 'mtlname', mtlname);
+        log.log('参照材質', 'mtlname', mtlname);
       }
     }
 
@@ -729,10 +797,10 @@ class Model {
   }
 
 
-/**
- * 
- * @param {ArrayBuffer} ab 
- */
+  /**
+   * 
+   * @param {ArrayBuffer} ab 
+   */
   parseGPB(ab) {
     const p = new DataView(ab);
     const gr = this.parse(p, (arg) => {
@@ -741,10 +809,10 @@ class Model {
     return gr;
   }
 
-/**
- * 
- * @param {string} instr 
- */
+  /**
+   * 
+   * @param {string} instr 
+   */
   parseMaterial(instr) {
     const ret = {
       materials: [],
@@ -789,10 +857,10 @@ class Model {
     return ret;
   }
 
-/**
- * 
- * @param {(...args)=>void} f 
- */
+  /**
+   * 
+   * @param {(...args)=>void} f 
+   */
   setLog(f) {
     log.log = f;
   }
@@ -815,5 +883,4 @@ _global.GPB = {
 };
 
 } )(globalThis);
-
 
