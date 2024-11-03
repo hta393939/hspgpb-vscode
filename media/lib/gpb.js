@@ -232,11 +232,23 @@ class Bounds {
 }
 
 class Part {
-/**
- * u16 面頂点の型
- * @default 0x1403
- */
+  /**
+   * u8 面頂点の型
+   * @default 0x1401
+   */
+  static GL_UNSIGNED_BYTE = 0x1401;
+
+  /**
+   * u16 面頂点の型
+   * @default 0x1403
+   */
   static GL_UNSIGNED_SHORT = 0x1403;
+
+  /**
+   * u32 面頂点の型
+   * @default 0x1405
+   */
+  static GL_UNSIGNED_INT = 0x1405;
 
   static GL_TRIANGLES = 4;
   /**
@@ -252,19 +264,19 @@ class Part {
   };
 
   constructor() {
-/**
- * 1つめ
- */
+    /**
+     * 1つめ
+     */
     this.primitiveType = Part.GL_TRIANGLES;
-/**
- * 面頂点インデックスの要素型(u16 or u32)
- * @default {Part.GL_UNSIGNED_SHORT}
- */
+    /**
+     * 面頂点インデックスの要素型(u16 or u32)
+     * @default {Part.GL_UNSIGNED_SHORT}
+     */
     this.faceIndexElement = Part.GL_UNSIGNED_SHORT;
-/**
- * 一直線の頂点インデックス
- * @type {number[]}
- */
+    /**
+     * 一直線の頂点インデックス
+     * @type {number[]}
+     */
     this.fis = [];
   }    
 }
@@ -615,12 +627,19 @@ class Model {
             log.log('0x', fiattr[0].toString(16), fiattr[1].toString(16));
 
             let fis = [];
-            if (fiattr[1] === Part.GL_UNSIGNED_SHORT) {
-              fis = this.r16s(p, fiattr[2] / 2);
-              log.log('fis16', fis);
-            } else {
-              fis = this.r32s(p, fiattr[2] / 4);
-              log.log('fis32', fis);
+            switch (fiattr[1]) {
+              case Part.GL_UNSIGNED_BYTE:
+                fis = this.r8s(p, fiattr[2] / 1);
+                log.log('fis8', fis);
+                break;
+              case Part.GL_UNSIGNED_SHORT:
+                fis = this.r16s(p, fiattr[2] / 2);
+                log.log('fis16', fis);
+                break;
+              case Part.GL_UNSIGNED_INT:
+                fis = this.r32s(p, fiattr[2] / 4);
+                log.log('fis32', fis);
+                break;
             }
 
             const indexmax = Math.max(...fis);
