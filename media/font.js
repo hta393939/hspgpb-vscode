@@ -125,10 +125,10 @@ class Font {
     this.parseFont(p);
   }
 
-/**
- * 
- * @param {DataView} p 
- */
+  /**
+   * 
+   * @param {DataView} p 
+   */
   parseFont(p) {
     console.log('parseFont');
 
@@ -147,18 +147,28 @@ class Font {
     const charset = this.str(p);
     const glyphnum = this.i32(p);
 
+    console.log('name, ', this.name, style, fontSizeCount, size, charset, glyphnum);
+
+    const glyphs = [];
     for (let i = 0; i < glyphnum; ++i) {
-      this.i32(p); // code
-      this.i32(p); // width
+      const glyph = {uvs: [0, 0, 0, 0]};
+
+      glyph.code = this.i32(p); // code
+      glyph.width = this.i32(p); // width
       if (this.major >= 1 && this.minor >= 5) {
-        this.i32(p); // bearingX
-        this.i32(p); // advance
+        glyph.bearingX = this.i32(p); // bearingX
+        glyph.advance = this.i32(p); // advance
+      } else {
+        glyph.bearingX = 0;
+        glyph.advance = glyph.width;
       }
-      this.f32(p);
-      this.f32(p);
-      this.f32(p);
-      this.f32(p);
+      glyph.uvs[0] = this.f32(p);
+      glyph.uvs[1] = this.f32(p);
+      glyph.uvs[2] = this.f32(p);
+      glyph.uvs[3] = this.f32(p);
+      glyphs.push(glyph);
     }
+    console.log('glyphs', glyphs);
 
     const w = this.i32(p);
     const h = this.i32(p);
