@@ -127,6 +127,7 @@ class Font {
 
   /**
    * 
+   * @see https://github.com/gameplay3d/gameplay/blob/master/gameplay/src/Font.h
    * @param {DataView} p 
    */
   parseFont(p) {
@@ -147,7 +148,10 @@ class Font {
     const charset = this.str(p);
     const glyphnum = this.i32(p);
 
-    console.log('name, ', this.name, style, fontSizeCount, size, charset, glyphnum);
+    console.log('name', this.name,
+      'style', style, fontSizeCount, size,
+      'charset', charset,
+      'glyphnum', glyphnum);
 
     const glyphs = [];
     for (let i = 0; i < glyphnum; ++i) {
@@ -175,7 +179,12 @@ class Font {
     const bytenum = this.i32(p);
     console.log('bitmap', w, h, bytenum);
 
-    str = `${this.name}, style ${style}, size ${size}, ${glyphnum} glyph`;
+    let format = 0; // Font::BITMAP = 0
+    if (this.major >= 1 && this.minor >= 3) {
+      format = this.i32(p);
+    }
+
+    str = `${this.name}, style ${style}, size ${size}, ${glyphnum} glyph, format ${format}`;
     el.textContent = str;
 
     const canvas = document.getElementById('main');

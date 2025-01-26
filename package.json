@@ -2,7 +2,7 @@
   "name": "hspgpb-vscode",
   "displayName": "hspgpb-vscode",
   "description": "HSP gpb preview for VS Code",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "hta393939",
   "license": "MIT",
   "repository": {
@@ -70,7 +70,9 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "cp": "copy /b .\\tool\\look.html .\\media\\look.html && copy /b .\\tool\\look.data .\\media\\look.data",
+    "cpw": "copy /b .\\tool\\look.html .\\media\\look.html && copy /b .\\tool\\look.data .\\media\\look.data",
+    "cp": "cp ./tool/look.html ./media/look.html && cp ./tool/look.data ./media/look.data",
+    "packw": "npm run cp && npm run compile && npx vsce package",
     "pack": "npm run cp && npm run compile && npx vsce package"
   },
   "devDependencies": {
